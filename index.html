@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #DED9CC; font-family: 'Jost', sans-serif; }
+    a { color: #1E4034; }
+    a:hover { color: #B0893C; }
+    @keyframes om-rise { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
+    @keyframes om-ring { 0%,100% { transform: scale(1); } 50% { transform: scale(1.035); } }
+    @keyframes om-shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+    @keyframes om-float { 0%,100% { transform: translate(0,0); } 50% { transform: translate(0,-10px); } }
+    @keyframes om-draw { from { stroke-dashoffset: 320; } to { stroke-dashoffset: 0; } }
+    @keyframes om-caret { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+    @keyframes om-seal-pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+    .om-ring { animation: om-ring 5s ease-in-out infinite; }
+    .om-float { animation: om-float 8s ease-in-out infinite; }
+    .om-shimmer { background: linear-gradient(100deg, #B0893C 20%, #F1D999 46%, #E7C878 50%, #B0893C 74%); background-size: 200% auto; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; animation: om-shimmer 5.5s linear infinite; }
+    .om-laurel path, .om-laurel circle { stroke-dasharray: 900; animation: om-draw 2.4s ease forwards; }
+    .om-caret { display: inline-block; width: 2px; height: 1em; background: #B0893C; margin-left: 2px; vertical-align: -2px; animation: om-caret 1s step-end infinite; }
+    .om-reveal > * { animation: om-rise 0.7s cubic-bezier(.2,.7,.3,1) both; }
+    .om-reveal > *:nth-child(2){animation-delay:.06s}.om-reveal > *:nth-child(3){animation-delay:.12s}.om-reveal > *:nth-child(4){animation-delay:.18s}.om-reveal > *:nth-child(5){animation-delay:.24s}.om-reveal > *:nth-child(6){animation-delay:.3s}.om-reveal > *:nth-child(7){animation-delay:.36s}.om-reveal > *:nth-child(8){animation-delay:.42s}.om-reveal > *:nth-child(9){animation-delay:.48s}
+    .om-env { position: fixed; inset: 0; z-index: 20; transition: transform 1s cubic-bezier(.7,0,.3,1), opacity 1s; }
+    .om-env.open { transform: translateY(-104%); opacity: 0; pointer-events: none; }
+    .om-seal { animation: om-seal-pulse 3s ease-in-out infinite; cursor: pointer; transition: transform .25s; }
+    .om-seal:hover { transform: scale(1.06); }
+  </style>
+</helmet>
+
+<div style="min-height: 100vh; display: flex; justify-content: center; padding: 0; box-sizing: border-box; background: #DED9CC;">
+
+  <!-- ===== The card ===== -->
+  <div style="position: relative; width: 100%; max-width: 480px; background: #F5F2E9; color: #1E4034; overflow: hidden; box-shadow: 0 24px 70px rgba(0,0,0,0.28); box-sizing: border-box;">
+
+    <!-- faint repeating monogram watermark -->
+    <div aria-hidden="true" style="position: absolute; inset: 0; pointer-events: none; opacity: 0.05; background-image: radial-gradient(circle, #1E4034 1.5px, transparent 1.6px); background-size: 26px 26px;"></div>
+    <div aria-hidden="true" style="position: absolute; top: 40%; left: 50%; transform: translate(-50%,-50%); font: 700 340px 'Cormorant Garamond', serif; color: #1E4034; opacity: 0.035; pointer-events: none; line-height: 1;">&amp;</div>
+
+    <div class="om-reveal" style="position: relative; padding: 52px 40px 46px; display: flex; flex-direction: column; align-items: center; text-align: center; box-sizing: border-box;">
+
+      <div style="font: 400 15px 'Jost', sans-serif; letter-spacing: 0.4em; text-transform: uppercase; color: #B0893C; padding-left: 0.4em;">Together with our families</div>
+
+      <!-- seal -->
+      <div class="om-ring" style="position: relative; width: 220px; height: 220px; margin: 22px 0 6px; display: flex; align-items: center; justify-content: center;">
+        <svg class="om-laurel" width="220" height="220" viewBox="0 0 300 300" fill="none" style="position: absolute; inset: 0;">
+          <circle cx="150" cy="150" r="142" stroke="#C9A24B" stroke-width="2.4"/>
+          <circle cx="150" cy="150" r="131" stroke="#C9A24B" stroke-width="0.9" opacity="0.5" style="animation:none;"/>
+          <path d="M150 6 l9 9 -9 9 -9 -9z" fill="#C9A24B" style="animation:none;"/>
+          <path d="M150 294 l7 7 -7 7 -7 -7z" fill="#C9A24B" style="animation:none;"/>
+          <path d="M70 198 C57 177 57 150 70 128" stroke="#C9A24B" stroke-width="1.8" fill="none"/>
+          <path d="M230 198 C243 177 243 150 230 128" stroke="#C9A24B" stroke-width="1.8" fill="none"/>
+          <g fill="#C9A24B" style="animation:none;">
+            <ellipse cx="60" cy="190" rx="5.2" ry="11.5" transform="rotate(42 60 190)"/><ellipse cx="55" cy="169" rx="5.2" ry="11.5" transform="rotate(22 55 169)"/><ellipse cx="54" cy="148" rx="5.2" ry="11.5" transform="rotate(4 54 148)"/><ellipse cx="58" cy="129" rx="5.2" ry="10.5" transform="rotate(-14 58 129)"/>
+            <ellipse cx="240" cy="190" rx="5.2" ry="11.5" transform="rotate(-42 240 190)"/><ellipse cx="245" cy="169" rx="5.2" ry="11.5" transform="rotate(-22 245 169)"/><ellipse cx="246" cy="148" rx="5.2" ry="11.5" transform="rotate(-4 246 148)"/><ellipse cx="242" cy="129" rx="5.2" ry="10.5" transform="rotate(14 242 129)"/>
+          </g>
+        </svg>
+        <div style="font: 600 66px 'Cormorant Garamond', serif; color: #1E4034; line-height: 1;">H<span style="font: italic 400 46px 'Cormorant Garamond', serif; color: #B0893C; vertical-align: 6px; margin: 0 2px;">&amp;</span>N</div>
+      </div>
+
+      <div style="font: italic 500 26px 'Cormorant Garamond', serif; color: #B0893C; margin-top: 6px;">the joy of a first meeting</div>
+      <div style="font: 600 58px 'Cormorant Garamond', serif; line-height: 1.02; margin-top: 2px;">Introduction<br>&amp; Lunch</div>
+      <div style="font: 300 18px 'Jost', sans-serif; margin-top: 16px; line-height: 1.6; color: #3E5348;">Nivedha's family warmly invites you to lunch, as we welcome <span style="color:#1E4034;font-weight:500;">Harsimran</span> and share our very first afternoon together.</div>
+
+      <!-- countdown -->
+      <div style="width: 100%; margin-top: 28px; background: #1E4034; border-radius: 4px; padding: 18px 12px; display: flex; justify-content: space-around; box-sizing: border-box;">
+        <div style="display:flex;flex-direction:column;gap:4px;"><span style="font:500 30px 'Cormorant Garamond',serif;color:#E7C878;">{{ cd.d }}</span><span style="font:400 11px 'Jost',sans-serif;letter-spacing:0.18em;text-transform:uppercase;color:#B7C4BB;">days</span></div>
+        <div style="display:flex;flex-direction:column;gap:4px;"><span style="font:500 30px 'Cormorant Garamond',serif;color:#E7C878;">{{ cd.h }}</span><span style="font:400 11px 'Jost',sans-serif;letter-spacing:0.18em;text-transform:uppercase;color:#B7C4BB;">hrs</span></div>
+        <div style="display:flex;flex-direction:column;gap:4px;"><span style="font:500 30px 'Cormorant Garamond',serif;color:#E7C878;">{{ cd.m }}</span><span style="font:400 11px 'Jost',sans-serif;letter-spacing:0.18em;text-transform:uppercase;color:#B7C4BB;">min</span></div>
+        <div style="display:flex;flex-direction:column;gap:4px;"><span style="font:500 30px 'Cormorant Garamond',serif;color:#E7C878;">{{ cd.s }}</span><span style="font:400 11px 'Jost',sans-serif;letter-spacing:0.18em;text-transform:uppercase;color:#B7C4BB;">sec</span></div>
+      </div>
+
+      <!-- typed note -->
+      <div style="width: 100%; margin-top: 30px; text-align: left; border-left: 2px solid #C9A24B; padding: 4px 0 4px 18px; box-sizing: border-box; min-height: 132px;">
+        <div style="font: 400 13px 'Jost', sans-serif; letter-spacing: 0.22em; text-transform: uppercase; color: #B0893C;">A note from us</div>
+        <div style="font: italic 400 21px 'Cormorant Garamond', serif; line-height: 1.5; color: #2A3E34; margin-top: 8px;">{{ note }}<span class="om-caret"></span></div>
+      </div>
+
+      <!-- our story -->
+      <div style="width:100%; margin-top: 32px; text-align:left; box-sizing:border-box;">
+        <div style="font: 400 13px 'Jost', sans-serif; letter-spacing: 0.22em; text-transform: uppercase; color: #B0893C; text-align:center;">Our little story</div>
+        <div style="display:flex; flex-direction:column; gap:2px; margin-top:16px;">
+          <div style="display:flex; gap:16px; align-items:flex-start;"><div style="font:500 17px 'Jost',sans-serif; color:#B0893C; width:56px; flex-shrink:0;">2023</div><div style="position:relative; padding-bottom:20px;"><div style="font:400 18px 'Jost',sans-serif;">A quiet first hello</div></div></div>
+          <div style="display:flex; gap:16px; align-items:flex-start;"><div style="font:500 17px 'Jost',sans-serif; color:#B0893C; width:56px; flex-shrink:0;">2025</div><div style="position:relative; padding-bottom:20px;"><div style="font:400 18px 'Jost',sans-serif;">Two hearts, one promise</div></div></div>
+          <div style="display:flex; gap:16px; align-items:flex-start;"><div style="font:500 17px 'Jost',sans-serif; color:#B0893C; width:56px; flex-shrink:0;">2026</div><div><div style="font:400 18px 'Jost',sans-serif;">The day our families meet</div></div></div>
+        </div>
+      </div>
+
+      <!-- menu peek -->
+      <div style="width:100%; margin-top: 30px; background:#EDE8DB; border:1px solid rgba(176,137,60,0.4); border-radius:4px; padding:22px 24px; box-sizing:border-box;">
+        <div style="font: 400 13px 'Jost', sans-serif; letter-spacing: 0.22em; text-transform: uppercase; color: #B0893C;">On the table</div>
+        <div style="font: 400 20px 'Cormorant Garamond', serif; font-style:italic; color:#2A3E34; margin-top:10px; line-height:1.7;">Slow-cooked biryani · Kebab platter<br>Mughlai curries · Phirni to finish</div>
+      </div>
+
+      <!-- when & where -->
+      <div style="width:100%; margin-top: 30px; display:flex; gap: 18px; justify-content:center; text-align:center;">
+        <div style="flex:1;"><div style="font:400 12px 'Jost',sans-serif;letter-spacing:0.2em;text-transform:uppercase;color:#B0893C;">When</div><div style="font:400 17px 'Jost',sans-serif;margin-top:8px;line-height:1.5;">Sunday<br>09 / 08 / 2026<br>10:30 AM – 2 PM</div></div>
+        <div style="width:1px;background:rgba(176,137,60,0.4);"></div>
+        <div style="flex:1;"><div style="font:400 12px 'Jost',sans-serif;letter-spacing:0.2em;text-transform:uppercase;color:#B0893C;">Where</div><div style="font:400 15px 'Jost',sans-serif;margin-top:8px;line-height:1.5;"><span style="color:#B0893C;font-weight:500;">Zaitoon Restaurant</span><br>Anna Nagar East, Chennai<br><span style="color:#7A8A80;font-size:13px;">Opp. Old Zaitoon Building</span></div></div>
+      </div>
+
+      <!-- action buttons -->
+      <div style="width:100%; margin-top: 30px; display:flex; flex-direction:column; gap:12px;">
+        <a href="{{ icsHref }}" download="Harsimran-Nivedha-Lunch.ics" style="display:flex; align-items:center; justify-content:center; gap:10px; text-decoration:none; background:#1E4034; color:#E7C878; padding:16px; border-radius:999px; font:500 16px 'Jost',sans-serif; letter-spacing:0.03em;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E7C878" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Add to my calendar</a>
+        <a href="https://www.google.com/maps/search/?api=1&query=Zaitoon%20Restaurant%20Anna%20Nagar%20East%20Chennai%20600102" target="_blank" style="display:flex; align-items:center; justify-content:center; gap:10px; text-decoration:none; background:#F5F2E9; color:#1E4034; border:1.5px solid #1E4034; padding:15px; border-radius:999px; font:500 16px 'Jost',sans-serif; letter-spacing:0.03em;"><svg width="18" height="18" viewBox="0 0 24 24" fill="#1E4034"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>Open location in Maps</a>
+      </div>
+
+      <!-- RSVP -->
+      <div style="width:100%; margin-top: 30px; background:#1E4034; border-radius:6px; padding:26px 24px; box-sizing:border-box; text-align:center;">
+        <div style="font: 500 24px 'Cormorant Garamond', serif; font-style:italic; color:#E7C878;">Will you join us?</div>
+        <sc-if value="{{ rsvpDone }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:14px; font:400 17px 'Jost',sans-serif; color:#F2EDDD; line-height:1.55;">{{ rsvpMsg }}</div>
+        </sc-if>
+        <sc-if value="{{ rsvpOpen }}" hint-placeholder-val="{{ true }}">
+          <input type="text" placeholder="Your name" value="{{ guestName }}" onChange="{{ onNameChange }}" style="width:100%; margin-top:16px; padding:13px 16px; border-radius:999px; border:1.5px solid rgba(231,200,120,0.5); background:rgba(255,255,255,0.08); color:#F2EDDD; font:400 15px 'Jost',sans-serif; box-sizing:border-box; text-align:center;" />
+          <div style="display:flex; gap:12px; margin-top:12px;">
+            <button onClick="{{ accept }}" disabled="{{ rsvpBusy }}" style="flex:1; cursor:pointer; background:#E7C878; color:#1E2B22; border:none; padding:14px; border-radius:999px; font:500 15px 'Jost',sans-serif; opacity:{{ rsvpBusyOpacity }};">Joyfully accept</button>
+            <button onClick="{{ decline }}" disabled="{{ rsvpBusy }}" style="flex:1; cursor:pointer; background:transparent; color:#E7C878; border:1.5px solid rgba(231,200,120,0.6); padding:14px; border-radius:999px; font:500 15px 'Jost',sans-serif; opacity:{{ rsvpBusyOpacity }};">Regretfully decline</button>
+          </div>
+          <sc-if value="{{ rsvpError }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top:10px; font:400 13px 'Jost',sans-serif; color:#F4B4A6;">{{ rsvpError }}</div>
+          </sc-if>
+        </sc-if>
+      </div>
+
+      <!-- QR shared album -->
+      <div style="width:100%; margin-top: 30px; display:flex; align-items:center; gap:20px; text-align:left;">
+        <div style="width:104px; height:104px; flex-shrink:0; background:#FFFFFF; border:1px solid rgba(176,137,60,0.4); border-radius:8px; padding:7px; box-sizing:border-box;"><img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&margin=0&color=1E4034&bgcolor=FFFFFF&data=https%3A%2F%2Fphotos.app.goo.gl%2Fharsimran-nivedha" alt="Shared album QR" style="width:100%; height:100%; display:block;"></div>
+        <div><div style="font: 400 13px 'Jost', sans-serif; letter-spacing: 0.2em; text-transform: uppercase; color: #B0893C;">Snap &amp; share</div><div style="font: 400 16px 'Jost', sans-serif; margin-top:6px; line-height:1.5; color:#2A3E34;">Scan to add your photos from the day to our shared album.</div></div>
+      </div>
+
+      <svg width="160" height="20" viewBox="0 0 220 26" fill="none" style="margin: 34px 0 8px;"><path d="M8 13 H92" stroke="#C9A24B" stroke-width="1.4"/><path d="M212 13 H128" stroke="#C9A24B" stroke-width="1.4"/><path d="M110 5 L118 13 L110 21 L102 13 Z" fill="#C9A24B"/><circle cx="96" cy="13" r="2.4" fill="#C9A24B"/><circle cx="124" cy="13" r="2.4" fill="#C9A24B"/></svg>
+      <div class="om-shimmer" style="font: italic 500 22px 'Cormorant Garamond', serif;">we can't wait to meet you</div>
+    </div>
+  </div>
+
+  <!-- ===== Envelope overlay ===== -->
+  <div class="om-env {{ envOpen }}" style="background: radial-gradient(circle at 50% 40%, #24503F 0%, #1E4034 55%, #142720 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 30px;">
+    <div style="position:absolute; inset:24px; border:1.5px solid rgba(201,162,75,0.4); pointer-events:none;"></div>
+    <div style="font: 400 15px 'Jost', sans-serif; letter-spacing: 0.42em; text-transform: uppercase; color: #E7C878; padding-left: 0.42em;">You're invited</div>
+    <div style="font: 600 46px 'Cormorant Garamond', serif; color: #F3EBD8; text-align:center; line-height:1.1;">Harsimran <span style="font-style:italic;color:#E7C878;">&amp;</span> Nivedha</div>
+    <div onClick="{{ open }}" class="om-seal" style="width: 150px; height: 150px; border-radius:50%; background: radial-gradient(circle at 38% 34%, #C9A24B, #9A7628); display:flex; align-items:center; justify-content:center; box-shadow: 0 10px 30px rgba(0,0,0,0.4), inset 0 2px 8px rgba(255,255,255,0.3);">
+      <div style="width:126px; height:126px; border-radius:50%; border:2px dashed rgba(30,43,34,0.5); display:flex; align-items:center; justify-content:center; font: 600 54px 'Cormorant Garamond', serif; color:#1E2B22;">H<span style="font-size:26px;font-style:italic;vertical-align:8px;margin:0 1px;">&amp;</span>N</div>
+    </div>
+    <div style="font: 400 16px 'Jost', sans-serif; letter-spacing: 0.14em; color: rgba(243,235,216,0.85);">Tap the seal to open</div>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const FORMSPREE_ENDPOINT = "https://formspree.io/f/REPLACE_WITH_YOUR_FORM_ID";
+
+class Component extends DCLogic {
+  state = { opened: false, now: Date.now(), note: "", rsvp: null, guestName: "", rsvpBusy: false, rsvpError: "" };
+  fullNote = "Dear family, we have waited a long while for this day. Over a slow, happy lunch we hope to share stories, laughter, and the beginning of one big family. With love \u2014 Harsimran & Nivedha";
+  target = new Date(2026, 7, 9, 10, 30, 0).getTime();
+
+  componentDidMount() {
+    this.tick = setInterval(() => this.setState({ now: Date.now() }), 1000);
+  }
+  componentWillUnmount() {
+    clearInterval(this.tick);
+    clearInterval(this.typer);
+  }
+  open = () => {
+    if (this.state.opened) return;
+    this.setState({ opened: true });
+    let i = 0;
+    this.typer = setInterval(() => {
+      i += 1;
+      this.setState({ note: this.fullNote.slice(0, i) });
+      if (i >= this.fullNote.length) clearInterval(this.typer);
+    }, 28);
+  };
+  onNameChange = (e) => this.setState({ guestName: e.target.value, rsvpError: "" });
+  accept = () => this.submitRSVP("yes");
+  decline = () => this.submitRSVP("no");
+
+  submitRSVP = (response) => {
+    if (this.state.rsvpBusy) return;
+    const name = this.state.guestName.trim();
+    if (!name) {
+      this.setState({ rsvpError: "Please add your name so we know who's coming." });
+      return;
+    }
+    this.setState({ rsvpBusy: true, rsvpError: "" });
+    fetch(FORMSPREE_ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify({
+        name,
+        response: response === "yes" ? "Accepted" : "Declined",
+        event: "Harsimran & Nivedha — Introduction & Lunch",
+      }),
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("send failed");
+        this.setState({ rsvp: response, rsvpBusy: false });
+      })
+      .catch(() => {
+        this.setState({
+          rsvpBusy: false,
+          rsvpError: "Couldn't send your response — please try again or let us know directly.",
+        });
+      });
+  };
+
+  pad(n) { return String(n).padStart(2, "0"); }
+
+  renderVals() {
+    let diff = Math.max(0, this.target - this.state.now);
+    const d = Math.floor(diff / 86400000); diff -= d * 86400000;
+    const h = Math.floor(diff / 3600000); diff -= h * 3600000;
+    const m = Math.floor(diff / 60000); diff -= m * 60000;
+    const s = Math.floor(diff / 1000);
+
+    const ics = [
+      "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//HN//Invite//EN", "BEGIN:VEVENT",
+      "UID:hn-lunch-20260809@invite", "DTSTAMP:20260717T000000Z",
+      "DTSTART:20260809T050000Z", "DTEND:20260809T083000Z",
+      "SUMMARY:Introduction & Lunch \u2014 Harsimran & Nivedha",
+      "LOCATION:Zaitoon Restaurant, Anna Nagar East, Chennai 600102",
+      "DESCRIPTION:Meeting the family over lunch. Opposite the Old Zaitoon Building.",
+      "END:VEVENT", "END:VCALENDAR"
+    ].join("\r\n");
+
+    return {
+      envOpen: this.state.opened ? "open" : "",
+      open: this.open,
+      cd: { d: String(d), h: this.pad(h), m: this.pad(m), s: this.pad(s) },
+      note: this.state.note,
+      icsHref: "data:text/calendar;charset=utf-8," + encodeURIComponent(ics),
+      rsvpDone: !!this.state.rsvp,
+      rsvpOpen: !this.state.rsvp,
+      rsvpMsg: this.state.rsvp === "yes"
+        ? "Wonderful \u2014 we're so glad you'll be there. See you at the table!"
+        : "We'll miss you, but thank you for letting us know. Warmly, H & N.",
+      accept: this.accept,
+      decline: this.decline,
+      guestName: this.state.guestName,
+      onNameChange: this.onNameChange,
+      rsvpBusy: this.state.rsvpBusy,
+      rsvpBusyOpacity: this.state.rsvpBusy ? 0.6 : 1,
+      rsvpError: this.state.rsvpError,
+    };
+  }
+}
+</script>
+</body>
+</html>
