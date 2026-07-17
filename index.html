@@ -23,7 +23,7 @@
   <meta property="og:title" content="Harsimran & Nivedha — Introduction & Lunch">
   <meta property="og:description" content="Join us for lunch as our families meet for the first time — Sunday, Aug 9 2026 at Zaitoon Restaurant, Chennai.">
   <meta property="og:type" content="website">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%231E4034'/%3E%3Ctext x='50' y='64' font-size='42' text-anchor='middle' fill='%23E7C878' font-family='Georgia,serif'%3EHN%3C/text%3E%3C/svg%3E">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='31' fill='%231E4034'/%3E%3Ccircle cx='32' cy='32' r='27' fill='none' stroke='%23C9A24B' stroke-width='1.6'/%3E%3Ctext x='32' y='42' font-family='Georgia,serif' font-size='26' font-weight='700' text-anchor='middle' fill='%23E7C878'%3EH%3Ctspan font-style='italic' font-weight='400' font-size='16' dy='1'%3E%26%3C/tspan%3EN%3C/text%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
@@ -132,6 +132,7 @@
       <!-- action buttons -->
       <div style="width:100%; margin-top: 30px; display:flex; flex-direction:column; gap:12px;">
         <a href="{{ icsHref }}" download="Harsimran-Nivedha-Lunch.ics" style="display:flex; align-items:center; justify-content:center; gap:10px; text-decoration:none; background:#1E4034; color:#E7C878; padding:16px; border-radius:999px; font:500 16px 'Jost',sans-serif; letter-spacing:0.03em;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E7C878" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Add to my calendar</a>
+        <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Introduction%20%26%20Lunch%20%E2%80%94%20Harsimran%20%26%20Nivedha&dates=20260809T050000Z%2F20260809T083000Z&details=Meeting%20the%20family%20over%20lunch.%20Opposite%20the%20Old%20Zaitoon%20Building.&location=Zaitoon%20Restaurant%2C%20Anna%20Nagar%20East%2C%20Chennai%20600102" target="_blank" rel="noopener" style="text-align:center; text-decoration:underline; color:#3E5348; font:400 13px 'Jost',sans-serif;">Prefer Google Calendar? Add it here</a>
         <a href="https://www.google.com/maps/search/?api=1&query=Zaitoon%20Restaurant%20Anna%20Nagar%20East%20Chennai%20600102" target="_blank" style="display:flex; align-items:center; justify-content:center; gap:10px; text-decoration:none; background:#F5F2E9; color:#1E4034; border:1.5px solid #1E4034; padding:15px; border-radius:999px; font:500 16px 'Jost',sans-serif; letter-spacing:0.03em;"><svg width="18" height="18" viewBox="0 0 24 24" fill="#1E4034"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>Open location in Maps</a>
       </div>
 
@@ -140,6 +141,7 @@
         <div style="font: 500 24px 'Cormorant Garamond', serif; font-style:italic; color:#E7C878;">Will you join us?</div>
         <sc-if value="{{ rsvpDone }}" hint-placeholder-val="{{ false }}">
           <div style="margin-top:14px; font:400 17px 'Jost',sans-serif; color:#F2EDDD; line-height:1.55;">{{ rsvpMsg }}</div>
+          <button onClick="{{ changeRsvp }}" style="margin-top:12px; cursor:pointer; background:none; border:none; text-decoration:underline; color:#B7C4BB; font:400 13px 'Jost',sans-serif;">Need to change your response?</button>
         </sc-if>
         <sc-if value="{{ rsvpOpen }}" hint-placeholder-val="{{ true }}">
           <input type="text" placeholder="Your name" value="{{ guestName }}" onChange="{{ onNameChange }}" maxLength="60" style="width:100%; margin-top:16px; padding:13px 16px; border-radius:999px; border:1.5px solid rgba(231,200,120,0.5); background:rgba(255,255,255,0.08); color:#F2EDDD; font:400 15px 'Jost',sans-serif; box-sizing:border-box; text-align:center;" />
@@ -184,7 +186,7 @@ const STORAGE_KEY = "hn-lunch-rsvp";
 class Component extends DCLogic {
   state = { opened: false, now: Date.now(), note: "", rsvp: null, guestName: "", rsvpBusy: false, rsvpError: "" };
   fullNote = "Dear family, we have waited a long while for this day. Over a slow, happy lunch we hope to share stories, laughter, and the beginning of one big family. With love \u2014 Harsimran & Nivedha";
-  target = new Date(2026, 7, 9, 10, 30, 0).getTime();
+  target = Date.UTC(2026, 7, 9, 5, 0, 0); // 10:30 AM IST, in UTC so the countdown is correct for guests in any timezone
 
   saveLocal = (patch) => {
     try {
@@ -234,6 +236,10 @@ class Component extends DCLogic {
   };
   accept = () => this.submitRSVP("yes");
   decline = () => this.submitRSVP("no");
+  changeRsvp = () => {
+    this.setState({ rsvp: null, rsvpError: "" });
+    this.saveLocal({ rsvp: null });
+  };
 
   submitRSVP = (response) => {
     if (this.state.rsvpBusy) return;
@@ -303,6 +309,7 @@ class Component extends DCLogic {
         : "We'll miss you, but thank you for letting us know. Warmly, H & N.",
       accept: this.accept,
       decline: this.decline,
+      changeRsvp: this.changeRsvp,
       guestName: this.state.guestName,
       onNameChange: this.onNameChange,
       rsvpBusy: this.state.rsvpBusy,
