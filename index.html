@@ -8,6 +8,12 @@
 <body>
 <x-dc>
 <helmet>
+  <title>Harsimran & Nivedha — Introduction & Lunch</title>
+  <meta name="description" content="Join us for lunch as our families meet for the first time — Sunday, Aug 9 2026 at Zaitoon Restaurant, Chennai.">
+  <meta property="og:title" content="Harsimran & Nivedha — Introduction & Lunch">
+  <meta property="og:description" content="Join us for lunch as our families meet for the first time — Sunday, Aug 9 2026 at Zaitoon Restaurant, Chennai.">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%231E4034'/%3E%3Ctext x='50' y='64' font-size='42' text-anchor='middle' fill='%23E7C878' font-family='Georgia,serif'%3EHN%3C/text%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
@@ -119,10 +125,10 @@
           <div style="margin-top:14px; font:400 17px 'Jost',sans-serif; color:#F2EDDD; line-height:1.55;">{{ rsvpMsg }}</div>
         </sc-if>
         <sc-if value="{{ rsvpOpen }}" hint-placeholder-val="{{ true }}">
-          <input type="text" placeholder="Your name" value="{{ guestName }}" onChange="{{ onNameChange }}" style="width:100%; margin-top:16px; padding:13px 16px; border-radius:999px; border:1.5px solid rgba(231,200,120,0.5); background:rgba(255,255,255,0.08); color:#F2EDDD; font:400 15px 'Jost',sans-serif; box-sizing:border-box; text-align:center;" />
+          <input type="text" placeholder="Your name" value="{{ guestName }}" onChange="{{ onNameChange }}" maxLength="60" style="width:100%; margin-top:16px; padding:13px 16px; border-radius:999px; border:1.5px solid rgba(231,200,120,0.5); background:rgba(255,255,255,0.08); color:#F2EDDD; font:400 15px 'Jost',sans-serif; box-sizing:border-box; text-align:center;" />
           <div style="display:flex; gap:12px; margin-top:12px;">
-            <button onClick="{{ accept }}" disabled="{{ rsvpBusy }}" style="flex:1; cursor:pointer; background:#E7C878; color:#1E2B22; border:none; padding:14px; border-radius:999px; font:500 15px 'Jost',sans-serif; opacity:{{ rsvpBusyOpacity }};">Joyfully accept</button>
-            <button onClick="{{ decline }}" disabled="{{ rsvpBusy }}" style="flex:1; cursor:pointer; background:transparent; color:#E7C878; border:1.5px solid rgba(231,200,120,0.6); padding:14px; border-radius:999px; font:500 15px 'Jost',sans-serif; opacity:{{ rsvpBusyOpacity }};">Regretfully decline</button>
+            <button onClick="{{ accept }}" disabled="{{ rsvpBusy }}" style="flex:1; cursor:pointer; background:#E7C878; color:#1E2B22; border:none; padding:14px; border-radius:999px; font:500 15px 'Jost',sans-serif; opacity:{{ rsvpBusyOpacity }};">{{ acceptLabel }}</button>
+            <button onClick="{{ decline }}" disabled="{{ rsvpBusy }}" style="flex:1; cursor:pointer; background:transparent; color:#E7C878; border:1.5px solid rgba(231,200,120,0.6); padding:14px; border-radius:999px; font:500 15px 'Jost',sans-serif; opacity:{{ rsvpBusyOpacity }};">{{ declineLabel }}</button>
           </div>
           <sc-if value="{{ rsvpError }}" hint-placeholder-val="{{ false }}">
             <div style="margin-top:10px; font:400 13px 'Jost',sans-serif; color:#F4B4A6;">{{ rsvpError }}</div>
@@ -155,15 +161,34 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script>
-const FORMSPREE_ENDPOINT = "https://formspree.io/f/REPLACE_WITH_YOUR_FORM_ID";
+const FORMSPREE_ENDPOINT = "https://formspree.io/f/meeyavql";
+const STORAGE_KEY = "hn-lunch-rsvp";
 
 class Component extends DCLogic {
   state = { opened: false, now: Date.now(), note: "", rsvp: null, guestName: "", rsvpBusy: false, rsvpError: "" };
   fullNote = "Dear family, we have waited a long while for this day. Over a slow, happy lunch we hope to share stories, laughter, and the beginning of one big family. With love \u2014 Harsimran & Nivedha";
   target = new Date(2026, 7, 9, 10, 30, 0).getTime();
 
+  saveLocal = (patch) => {
+    try {
+      const current = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...current, ...patch }));
+    } catch {}
+  };
+
   componentDidMount() {
     this.tick = setInterval(() => this.setState({ now: Date.now() }), 1000);
+    try {
+      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
+      if (saved) {
+        this.setState({
+          opened: !!saved.opened,
+          note: saved.opened ? this.fullNote : "",
+          guestName: saved.guestName || "",
+          rsvp: saved.rsvp || null,
+        });
+      }
+    } catch {}
   }
   componentWillUnmount() {
     clearInterval(this.tick);
@@ -172,6 +197,7 @@ class Component extends DCLogic {
   open = () => {
     if (this.state.opened) return;
     this.setState({ opened: true });
+    this.saveLocal({ opened: true });
     let i = 0;
     this.typer = setInterval(() => {
       i += 1;
@@ -179,7 +205,10 @@ class Component extends DCLogic {
       if (i >= this.fullNote.length) clearInterval(this.typer);
     }, 28);
   };
-  onNameChange = (e) => this.setState({ guestName: e.target.value, rsvpError: "" });
+  onNameChange = (e) => {
+    this.setState({ guestName: e.target.value, rsvpError: "" });
+    this.saveLocal({ guestName: e.target.value });
+  };
   accept = () => this.submitRSVP("yes");
   decline = () => this.submitRSVP("no");
 
@@ -191,18 +220,21 @@ class Component extends DCLogic {
       return;
     }
     this.setState({ rsvpBusy: true, rsvpError: "" });
+    const responseLabel = response === "yes" ? "Accepted" : "Declined";
     fetch(FORMSPREE_ENDPOINT, {
       method: "POST",
       headers: { "Content-Type": "application/json", Accept: "application/json" },
       body: JSON.stringify({
         name,
-        response: response === "yes" ? "Accepted" : "Declined",
+        response: responseLabel,
         event: "Harsimran & Nivedha — Introduction & Lunch",
+        _subject: `RSVP ${responseLabel} — ${name}`,
       }),
     })
       .then((res) => {
         if (!res.ok) throw new Error("send failed");
         this.setState({ rsvp: response, rsvpBusy: false });
+        this.saveLocal({ rsvp: response, guestName: name });
       })
       .catch(() => {
         this.setState({
@@ -249,6 +281,8 @@ class Component extends DCLogic {
       rsvpBusy: this.state.rsvpBusy,
       rsvpBusyOpacity: this.state.rsvpBusy ? 0.6 : 1,
       rsvpError: this.state.rsvpError,
+      acceptLabel: this.state.rsvpBusy ? "Sending…" : "Joyfully accept",
+      declineLabel: this.state.rsvpBusy ? "Sending…" : "Regretfully decline",
     };
   }
 }
