@@ -3,6 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#1E4034">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-KCWX2XJD28"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-KCWX2XJD28');
+</script>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -76,12 +86,19 @@
       <div style="font: 300 18px 'Jost', sans-serif; margin-top: 16px; line-height: 1.6; color: #3E5348;">Nivedha's family warmly invites you to lunch, as we welcome <span style="color:#1E4034;font-weight:500;">Harsimran</span> and share our very first afternoon together.</div>
 
       <!-- countdown -->
-      <div style="width: 100%; margin-top: 28px; background: #1E4034; border-radius: 4px; padding: 18px 12px; display: flex; justify-content: space-around; box-sizing: border-box;">
-        <div style="display:flex;flex-direction:column;gap:4px;"><span style="font:500 30px 'Cormorant Garamond',serif;color:#E7C878;">{{ cd.d }}</span><span style="font:400 11px 'Jost',sans-serif;letter-spacing:0.18em;text-transform:uppercase;color:#B7C4BB;">days</span></div>
-        <div style="display:flex;flex-direction:column;gap:4px;"><span style="font:500 30px 'Cormorant Garamond',serif;color:#E7C878;">{{ cd.h }}</span><span style="font:400 11px 'Jost',sans-serif;letter-spacing:0.18em;text-transform:uppercase;color:#B7C4BB;">hrs</span></div>
-        <div style="display:flex;flex-direction:column;gap:4px;"><span style="font:500 30px 'Cormorant Garamond',serif;color:#E7C878;">{{ cd.m }}</span><span style="font:400 11px 'Jost',sans-serif;letter-spacing:0.18em;text-transform:uppercase;color:#B7C4BB;">min</span></div>
-        <div style="display:flex;flex-direction:column;gap:4px;"><span style="font:500 30px 'Cormorant Garamond',serif;color:#E7C878;">{{ cd.s }}</span><span style="font:400 11px 'Jost',sans-serif;letter-spacing:0.18em;text-transform:uppercase;color:#B7C4BB;">sec</span></div>
-      </div>
+      <sc-if value="{{ eventPassed }}" hint-placeholder-val="{{ false }}">
+        <div style="width: 100%; margin-top: 28px; background: #1E4034; border-radius: 4px; padding: 22px 12px; text-align: center; box-sizing: border-box;">
+          <span style="font: italic 500 20px 'Cormorant Garamond', serif; color: #E7C878;">Today's the day — see you at the table!</span>
+        </div>
+      </sc-if>
+      <sc-if value="{{ eventUpcoming }}" hint-placeholder-val="{{ true }}">
+        <div style="width: 100%; margin-top: 28px; background: #1E4034; border-radius: 4px; padding: 18px 12px; display: flex; justify-content: space-around; box-sizing: border-box;">
+          <div style="display:flex;flex-direction:column;gap:4px;"><span style="font:500 30px 'Cormorant Garamond',serif;color:#E7C878;">{{ cd.d }}</span><span style="font:400 11px 'Jost',sans-serif;letter-spacing:0.18em;text-transform:uppercase;color:#B7C4BB;">days</span></div>
+          <div style="display:flex;flex-direction:column;gap:4px;"><span style="font:500 30px 'Cormorant Garamond',serif;color:#E7C878;">{{ cd.h }}</span><span style="font:400 11px 'Jost',sans-serif;letter-spacing:0.18em;text-transform:uppercase;color:#B7C4BB;">hrs</span></div>
+          <div style="display:flex;flex-direction:column;gap:4px;"><span style="font:500 30px 'Cormorant Garamond',serif;color:#E7C878;">{{ cd.m }}</span><span style="font:400 11px 'Jost',sans-serif;letter-spacing:0.18em;text-transform:uppercase;color:#B7C4BB;">min</span></div>
+          <div style="display:flex;flex-direction:column;gap:4px;"><span style="font:500 30px 'Cormorant Garamond',serif;color:#E7C878;">{{ cd.s }}</span><span style="font:400 11px 'Jost',sans-serif;letter-spacing:0.18em;text-transform:uppercase;color:#B7C4BB;">sec</span></div>
+        </div>
+      </sc-if>
 
       <!-- typed note -->
       <div style="width: 100%; margin-top: 30px; text-align: left; border-left: 2px solid #C9A24B; padding: 4px 0 4px 18px; box-sizing: border-box; min-height: 132px;">
@@ -138,7 +155,7 @@
 
       <!-- QR shared album -->
       <a href="https://drive.google.com/drive/folders/1LOhweOYXz0bg3qx-0BTNSf4_sDkgRSi6?usp=sharing" target="_blank" rel="noopener" style="width:100%; margin-top: 30px; display:flex; align-items:center; gap:20px; text-align:left; text-decoration:none; color:inherit;">
-        <div style="width:104px; height:104px; flex-shrink:0; background:#FFFFFF; border:1px solid rgba(176,137,60,0.4); border-radius:8px; padding:7px; box-sizing:border-box;"><img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&margin=0&color=1E4034&bgcolor=FFFFFF&data=https%3A%2F%2Fdrive.google.com%2Fdrive%2Ffolders%2F1LOhweOYXz0bg3qx-0BTNSf4_sDkgRSi6%3Fusp%3Dsharing" alt="Shared album QR" style="width:100%; height:100%; display:block;"></div>
+        <div style="width:104px; height:104px; flex-shrink:0; background:#FFFFFF; border:1px solid rgba(176,137,60,0.4); border-radius:8px; padding:7px; box-sizing:border-box;"><img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&margin=0&color=1E4034&bgcolor=FFFFFF&data=https%3A%2F%2Fdrive.google.com%2Fdrive%2Ffolders%2F1LOhweOYXz0bg3qx-0BTNSf4_sDkgRSi6%3Fusp%3Dsharing" alt="Shared album QR" width="200" height="200" loading="lazy" style="width:100%; height:100%; display:block;"></div>
         <div><div style="font: 400 13px 'Jost', sans-serif; letter-spacing: 0.2em; text-transform: uppercase; color: #B0893C;">Snap &amp; share</div><div style="font: 400 16px 'Jost', sans-serif; margin-top:6px; line-height:1.5; color:#2A3E34;">Scan the code, or tap to open the folder, and add your photos from the day.</div></div>
       </a>
 
@@ -152,7 +169,7 @@
     <div style="position:absolute; inset:24px; border:1.5px solid rgba(201,162,75,0.4); pointer-events:none;"></div>
     <div style="font: 400 15px 'Jost', sans-serif; letter-spacing: 0.42em; text-transform: uppercase; color: #E7C878; padding-left: 0.42em;">You're invited</div>
     <div style="font: 600 46px 'Cormorant Garamond', serif; color: #F3EBD8; text-align:center; line-height:1.1;">Harsimran <span style="font-style:italic;color:#E7C878;">&amp;</span> Nivedha</div>
-    <div onClick="{{ open }}" class="om-seal" style="width: 150px; height: 150px; border-radius:50%; background: radial-gradient(circle at 38% 34%, #C9A24B, #9A7628); display:flex; align-items:center; justify-content:center; box-shadow: 0 10px 30px rgba(0,0,0,0.4), inset 0 2px 8px rgba(255,255,255,0.3);">
+    <div onClick="{{ open }}" onKeyDown="{{ openOnKey }}" role="button" tabIndex="0" aria-label="Open the invitation" class="om-seal" style="width: 150px; height: 150px; border-radius:50%; background: radial-gradient(circle at 38% 34%, #C9A24B, #9A7628); display:flex; align-items:center; justify-content:center; box-shadow: 0 10px 30px rgba(0,0,0,0.4), inset 0 2px 8px rgba(255,255,255,0.3);">
       <div style="width:126px; height:126px; border-radius:50%; border:2px dashed rgba(30,43,34,0.5); display:flex; align-items:center; justify-content:center; font: 600 54px 'Cormorant Garamond', serif; color:#1E2B22;">H<span style="font-size:26px;font-style:italic;vertical-align:8px;margin:0 1px;">&amp;</span>N</div>
     </div>
     <div style="font: 400 16px 'Jost', sans-serif; letter-spacing: 0.14em; color: rgba(243,235,216,0.85);">Tap the seal to open</div>
@@ -205,6 +222,12 @@ class Component extends DCLogic {
       if (i >= this.fullNote.length) clearInterval(this.typer);
     }, 28);
   };
+  openOnKey = (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      this.open();
+    }
+  };
   onNameChange = (e) => {
     this.setState({ guestName: e.target.value, rsvpError: "" });
     this.saveLocal({ guestName: e.target.value });
@@ -247,6 +270,7 @@ class Component extends DCLogic {
   pad(n) { return String(n).padStart(2, "0"); }
 
   renderVals() {
+    const eventPassed = this.state.now >= this.target;
     let diff = Math.max(0, this.target - this.state.now);
     const d = Math.floor(diff / 86400000); diff -= d * 86400000;
     const h = Math.floor(diff / 3600000); diff -= h * 3600000;
@@ -266,7 +290,10 @@ class Component extends DCLogic {
     return {
       envOpen: this.state.opened ? "open" : "",
       open: this.open,
+      openOnKey: this.openOnKey,
       cd: { d: String(d), h: this.pad(h), m: this.pad(m), s: this.pad(s) },
+      eventPassed,
+      eventUpcoming: !eventPassed,
       note: this.state.note,
       icsHref: "data:text/calendar;charset=utf-8," + encodeURIComponent(ics),
       rsvpDone: !!this.state.rsvp,
