@@ -35,26 +35,126 @@
     @keyframes om-shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
     @keyframes om-float { 0%,100% { transform: translate(0,0); } 50% { transform: translate(0,-10px); } }
     @keyframes om-draw { from { stroke-dashoffset: 320; } to { stroke-dashoffset: 0; } }
+    @keyframes om-draw-90 { from { stroke-dashoffset: 90; } to { stroke-dashoffset: 0; } }
     @keyframes om-caret { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
     @keyframes om-seal-pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+    @keyframes om-seal-crack { 0% { transform: scale(1) rotate(0); } 30% { transform: scale(.92) rotate(-2deg); } 60% { transform: scale(1.04) rotate(1.5deg); } 100% { transform: scale(1) rotate(0); } }
+    @keyframes om-glow-pulse { 0% { box-shadow: 0 0 0 0 rgba(231,200,120,0); } 30% { box-shadow: 0 0 24px 4px rgba(231,200,120,.35); } 100% { box-shadow: 0 0 0 0 rgba(231,200,120,0); } }
+    @keyframes om-shake { 10%,90% { transform: translateX(-1px); } 20%,80% { transform: translateX(2px); } 30%,50%,70% { transform: translateX(-4px); } 40%,60% { transform: translateX(4px); } }
     .om-ring { animation: om-ring 5s ease-in-out infinite; }
     .om-float { animation: om-float 8s ease-in-out infinite; }
     .om-shimmer { background: linear-gradient(100deg, #B0893C 20%, #F1D999 46%, #E7C878 50%, #B0893C 74%); background-size: 200% auto; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; animation: om-shimmer 5.5s linear infinite; }
     .om-laurel path, .om-laurel circle { stroke-dasharray: 900; animation: om-draw 2.4s ease forwards; }
     .om-caret { display: inline-block; width: 2px; height: 1em; background: #B0893C; margin-left: 2px; vertical-align: -2px; animation: om-caret 1s step-end infinite; }
-    .om-reveal > * { animation: om-rise 0.7s cubic-bezier(.2,.7,.3,1) both; }
-    .om-reveal > *:nth-child(2){animation-delay:.06s}.om-reveal > *:nth-child(3){animation-delay:.12s}.om-reveal > *:nth-child(4){animation-delay:.18s}.om-reveal > *:nth-child(5){animation-delay:.24s}.om-reveal > *:nth-child(6){animation-delay:.3s}.om-reveal > *:nth-child(7){animation-delay:.36s}.om-reveal > *:nth-child(8){animation-delay:.42s}.om-reveal > *:nth-child(9){animation-delay:.48s}
+    .om-reveal > *:nth-child(-n+6) { animation: om-rise 0.7s cubic-bezier(.2,.7,.3,1) both; }
+    .om-reveal > *:nth-child(2){animation-delay:.06s}.om-reveal > *:nth-child(3){animation-delay:.12s}.om-reveal > *:nth-child(4){animation-delay:.18s}.om-reveal > *:nth-child(5){animation-delay:.24s}.om-reveal > *:nth-child(6){animation-delay:.3s}
     .om-env { position: fixed; inset: 0; z-index: 20; transition: transform 1s cubic-bezier(.7,0,.3,1), opacity 1s; }
     .om-env.open { transform: translateY(-104%); opacity: 0; pointer-events: none; }
-    .om-seal { animation: om-seal-pulse 3s ease-in-out infinite; cursor: pointer; transition: transform .25s; }
-    .om-seal:hover { transform: scale(1.06); }
+    .om-seal {
+      cursor: pointer;
+      background-repeat: no-repeat;
+      background-image: linear-gradient(115deg, transparent 40%, rgba(255,255,255,.5) 50%, transparent 60%), radial-gradient(circle at 38% 34%, #C9A24B, #9A7628);
+      background-size: 250% 250%, 100% 100%;
+      background-position: 120% 120%, 0 0;
+      animation: om-seal-pulse 3s ease-in-out infinite;
+      transition: transform .25s, background-position .6s ease;
+    }
+    .om-seal:hover { transform: scale(1.06); background-position: -20% -20%, 0 0; }
+    .om-seal:active { transform: scale(0.97); }
+    .om-seal-crack { animation: om-seal-crack .5s cubic-bezier(.34,1.56,.64,1) both; }
+
+    /* tactile feedback */
+    .om-tap { transition: transform .15s cubic-bezier(.3,.7,.4,1), box-shadow .15s ease, filter .15s ease; }
+    .om-tap:active { transform: scale(0.96); filter: brightness(0.97); }
+    @media (hover:hover) { .om-tap:hover { transform: translateY(-1px); } }
+
+    /* focus-visible ring */
+    a:focus-visible, button:focus-visible, input:focus-visible, [role="button"]:focus-visible {
+      outline: none; box-shadow: 0 0 0 3px rgba(245,242,233,.9), 0 0 0 6px #C9A24B; border-radius: inherit; transition: box-shadow .2s ease;
+    }
+    .om-focus-dark:focus-visible { box-shadow: 0 0 0 3px rgba(30,64,52,.9), 0 0 0 6px #E7C878; }
+    .om-seal:focus-visible { box-shadow: 0 0 0 5px rgba(30,64,52,.9), 0 0 0 9px #E7C878; }
+
+    /* scroll-triggered reveal */
+    .om-inview { opacity: 0; transform: translateY(18px); transition: opacity .7s cubic-bezier(.2,.7,.3,1), transform .7s cubic-bezier(.2,.7,.3,1); }
+    .om-inview.om-shown { opacity: 1; transform: none; }
+
+    /* our story timeline */
+    .om-timeline { position: relative; }
+    .om-timeline::before { content: ''; position: absolute; left: 27px; top: 8px; bottom: 8px; width: 2px; background: linear-gradient(#C9A24B,#E7C878); transform: scaleY(0); transform-origin: top; transition: transform 1.1s cubic-bezier(.2,.7,.3,1); }
+    .om-timeline.om-shown::before { transform: scaleY(1); }
+    .om-story-row { opacity: 0; transform: translateX(-8px); transition: opacity .5s ease, transform .5s ease; }
+    .om-timeline.om-shown .om-story-row { opacity: 1; transform: none; }
+
+    /* when & where panels */
+    .om-slide-l { opacity: 0; transform: translateX(-14px); transition: opacity .7s ease, transform .7s ease; }
+    .om-slide-r { opacity: 0; transform: translateX(14px); transition: opacity .7s ease, transform .7s ease; }
+    .om-whenwhere.om-shown .om-slide-l, .om-whenwhere.om-shown .om-slide-r { opacity: 1; transform: none; }
+    .om-divider-grow { transform: scaleY(0); transform-origin: center; transition: transform .6s ease .15s; }
+    .om-whenwhere.om-shown .om-divider-grow { transform: scaleY(1); }
+
+    /* menu courses */
+    .om-dish { display: inline-block; opacity: 0; transform: translateY(6px); transition: opacity .5s ease, transform .5s ease; }
+    .om-menu-box.om-shown .om-dish:nth-of-type(1) { transition-delay: 0s; }
+    .om-menu-box.om-shown .om-dish:nth-of-type(2) { transition-delay: .09s; }
+    .om-menu-box.om-shown .om-dish:nth-of-type(3) { transition-delay: .18s; }
+    .om-menu-box.om-shown .om-dish:nth-of-type(4) { transition-delay: .27s; }
+    .om-menu-box.om-shown .om-dish { opacity: 1; transform: none; }
+
+    /* closing ornament bookend */
+    .om-close-line { stroke-dasharray: 90; stroke-dashoffset: 90; }
+    .om-closing.om-shown .om-close-line { animation: om-draw-90 1s ease forwards; }
+    .om-close-pop { opacity: 0; }
+    .om-closing.om-shown .om-close-pop { animation: om-rise .5s cubic-bezier(.2,.7,.3,1) .5s both; }
+
+    /* RSVP */
+    .om-rsvp-input { transition: box-shadow .3s ease, border-color .3s ease; }
+    .om-rsvp-input:focus { border-color: #E7C878; box-shadow: 0 0 0 4px rgba(231,200,120,.18); outline: none; }
+    .om-shake { animation: om-shake .4s cubic-bezier(.36,.07,.19,.97) both; }
+    .om-rsvp-card.om-glow { animation: om-glow-pulse 1.1s ease-out; }
+
+    /* secondary link underline draw-in */
+    .om-underline { text-decoration: none; background-image: linear-gradient(currentColor,currentColor); background-repeat: no-repeat; background-position: 0 100%; background-size: 0% 1px; transition: background-size .3s ease; }
+    .om-underline:hover, .om-underline:focus-visible { background-size: 100% 1px; }
+
+    /* calendar/maps icon hover motion */
+    .om-cal-icon { transition: transform .3s cubic-bezier(.3,1.5,.5,1); }
+    a:hover .om-cal-icon, a:focus-visible .om-cal-icon { transform: rotate(-6deg); }
+    @keyframes om-pin-drop { 0% { transform: translateY(-3px); } 60% { transform: translateY(1px); } 100% { transform: translateY(0); } }
+    a:hover .om-pin-icon, a:focus-visible .om-pin-icon { animation: om-pin-drop .4s ease-out; }
+
+    /* QR/share card lift */
+    .om-qr-link { transition: transform .25s ease; }
+    .om-qr-card { transition: box-shadow .25s ease, transform .25s ease; }
+    .om-qr-link:hover, .om-qr-link:focus-visible { transform: translateY(-3px); }
+    .om-qr-link:hover .om-qr-card, .om-qr-link:focus-visible .om-qr-card { box-shadow: 0 10px 22px rgba(30,64,52,0.18); transform: scale(1.035); }
+
+    /* accessibility helpers */
+    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .om-ring, .om-float, .om-shimmer, .om-tap, .om-inview, .om-dish, .om-story-row, .om-slide-l, .om-slide-r, .om-divider-grow, .om-rsvp-card.om-glow, .om-seal-crack, .om-cal-icon, .om-pin-icon, .om-qr-link, .om-qr-card {
+        animation: none !important; transition: none !important;
+      }
+      .om-laurel path, .om-laurel circle, .om-close-line { animation: none; stroke-dashoffset: 0; }
+      .om-close-pop { animation: none; opacity: 1; }
+      .om-caret { animation: none; opacity: 1; }
+      .om-reveal > *:nth-child(-n+6), .om-inview { opacity: 1 !important; transform: none !important; }
+      .om-timeline::before { transform: scaleY(1) !important; transition: none !important; }
+      .om-seal { animation: none; transition: none; background-position: 120% 120%, 0 0; }
+      .om-seal:hover { transform: none; background-position: 120% 120%, 0 0; }
+      .om-tap:hover, .om-qr-link:hover, .om-qr-link:hover .om-qr-card { transform: none; }
+      a:hover .om-cal-icon, a:hover .om-pin-icon { transform: none; animation: none; }
+      .om-underline { transition: background-size .05s ease; }
+      .om-env { transition: opacity .2s linear !important; }
+    }
   </style>
 </helmet>
 
 <div style="min-height: 100vh; display: flex; justify-content: center; padding: 0; box-sizing: border-box; background: #DED9CC;">
 
   <!-- ===== The card ===== -->
-  <div style="position: relative; width: 100%; max-width: 480px; background: #F5F2E9; color: #1E4034; overflow: hidden; box-shadow: 0 24px 70px rgba(0,0,0,0.28); box-sizing: border-box;">
+  <div id="om-card" tabIndex="-1" style="position: relative; width: 100%; max-width: 480px; background: #F5F2E9; color: #1E4034; overflow: hidden; box-shadow: 0 24px 70px rgba(0,0,0,0.28); box-sizing: border-box;">
 
     <!-- faint repeating monogram watermark -->
     <div aria-hidden="true" style="position: absolute; inset: 0; pointer-events: none; opacity: 0.05; background-image: radial-gradient(circle, #1E4034 1.5px, transparent 1.6px); background-size: 26px 26px;"></div>
@@ -92,66 +192,67 @@
         </div>
       </sc-if>
       <sc-if value="{{ eventUpcoming }}" hint-placeholder-val="{{ true }}">
-        <div style="width: 100%; margin-top: 28px; background: #1E4034; border-radius: 4px; padding: 18px 12px; display: flex; justify-content: space-around; box-sizing: border-box;">
-          <div style="display:flex;flex-direction:column;gap:4px;"><span style="font:500 30px 'Cormorant Garamond',serif;color:#E7C878;">{{ cd.d }}</span><span style="font:400 11px 'Jost',sans-serif;letter-spacing:0.18em;text-transform:uppercase;color:#B7C4BB;">days</span></div>
-          <div style="display:flex;flex-direction:column;gap:4px;"><span style="font:500 30px 'Cormorant Garamond',serif;color:#E7C878;">{{ cd.h }}</span><span style="font:400 11px 'Jost',sans-serif;letter-spacing:0.18em;text-transform:uppercase;color:#B7C4BB;">hrs</span></div>
-          <div style="display:flex;flex-direction:column;gap:4px;"><span style="font:500 30px 'Cormorant Garamond',serif;color:#E7C878;">{{ cd.m }}</span><span style="font:400 11px 'Jost',sans-serif;letter-spacing:0.18em;text-transform:uppercase;color:#B7C4BB;">min</span></div>
-          <div style="display:flex;flex-direction:column;gap:4px;"><span style="font:500 30px 'Cormorant Garamond',serif;color:#E7C878;">{{ cd.s }}</span><span style="font:400 11px 'Jost',sans-serif;letter-spacing:0.18em;text-transform:uppercase;color:#B7C4BB;">sec</span></div>
+        <div role="timer" aria-live="off" style="width: 100%; margin-top: 28px; background: #1E4034; border-radius: 4px; padding: 18px 12px; display: flex; justify-content: space-around; box-sizing: border-box;">
+          <div aria-hidden="true" style="display:flex;flex-direction:column;gap:4px;"><span style="font:500 30px 'Cormorant Garamond',serif;color:#E7C878;">{{ cd.d }}</span><span style="font:400 11px 'Jost',sans-serif;letter-spacing:0.18em;text-transform:uppercase;color:#B7C4BB;">days</span></div>
+          <div aria-hidden="true" style="display:flex;flex-direction:column;gap:4px;"><span style="font:500 30px 'Cormorant Garamond',serif;color:#E7C878;">{{ cd.h }}</span><span style="font:400 11px 'Jost',sans-serif;letter-spacing:0.18em;text-transform:uppercase;color:#B7C4BB;">hrs</span></div>
+          <div aria-hidden="true" style="display:flex;flex-direction:column;gap:4px;"><span style="font:500 30px 'Cormorant Garamond',serif;color:#E7C878;">{{ cd.m }}</span><span style="font:400 11px 'Jost',sans-serif;letter-spacing:0.18em;text-transform:uppercase;color:#B7C4BB;">min</span></div>
+          <div aria-hidden="true" style="display:flex;flex-direction:column;gap:4px;"><span style="font:500 30px 'Cormorant Garamond',serif;color:#E7C878;">{{ cd.s }}</span><span style="font:400 11px 'Jost',sans-serif;letter-spacing:0.18em;text-transform:uppercase;color:#B7C4BB;">sec</span></div>
+          <span class="sr-only">{{ countdownSummary }}</span>
         </div>
       </sc-if>
 
       <!-- typed note -->
       <div style="width: 100%; margin-top: 30px; text-align: left; border-left: 2px solid #C9A24B; padding: 4px 0 4px 18px; box-sizing: border-box; min-height: 132px;">
         <div style="font: 400 13px 'Jost', sans-serif; letter-spacing: 0.22em; text-transform: uppercase; color: #B0893C;">A note from us</div>
-        <div style="font: italic 400 21px 'Cormorant Garamond', serif; line-height: 1.5; color: #2A3E34; margin-top: 8px;">{{ note }}<span class="om-caret"></span></div>
+        <div style="font: italic 400 21px 'Cormorant Garamond', serif; line-height: 1.5; color: #2A3E34; margin-top: 8px;">{{ note }}<sc-if value="{{ showCaret }}" hint-placeholder-val="{{ false }}"><span class="om-caret"></span></sc-if></div>
       </div>
 
       <!-- our story -->
       <div style="width:100%; margin-top: 32px; text-align:left; box-sizing:border-box;">
         <div style="font: 400 13px 'Jost', sans-serif; letter-spacing: 0.22em; text-transform: uppercase; color: #B0893C; text-align:center;">Our little story</div>
-        <div style="display:flex; flex-direction:column; gap:2px; margin-top:16px;">
-          <div style="display:flex; gap:16px; align-items:flex-start;"><div style="font:500 17px 'Jost',sans-serif; color:#B0893C; width:56px; flex-shrink:0;">2023</div><div style="position:relative; padding-bottom:20px;"><div style="font:400 18px 'Jost',sans-serif;">A quiet first hello</div></div></div>
-          <div style="display:flex; gap:16px; align-items:flex-start;"><div style="font:500 17px 'Jost',sans-serif; color:#B0893C; width:56px; flex-shrink:0;">2025</div><div style="position:relative; padding-bottom:20px;"><div style="font:400 18px 'Jost',sans-serif;">Two hearts, one promise</div></div></div>
-          <div style="display:flex; gap:16px; align-items:flex-start;"><div style="font:500 17px 'Jost',sans-serif; color:#B0893C; width:56px; flex-shrink:0;">2026</div><div><div style="font:400 18px 'Jost',sans-serif;">The day our families meet</div></div></div>
+        <div class="om-timeline om-inview" style="display:flex; flex-direction:column; gap:2px; margin-top:16px;">
+          <div class="om-story-row" style="display:flex; gap:16px; align-items:flex-start;"><div style="font:500 17px 'Jost',sans-serif; color:#B0893C; width:56px; flex-shrink:0;">2023</div><div style="position:relative; padding-bottom:20px;"><div style="font:400 18px 'Jost',sans-serif;">A quiet first hello</div></div></div>
+          <div class="om-story-row" style="display:flex; gap:16px; align-items:flex-start;"><div style="font:500 17px 'Jost',sans-serif; color:#B0893C; width:56px; flex-shrink:0;">2025</div><div style="position:relative; padding-bottom:20px;"><div style="font:400 18px 'Jost',sans-serif;">Two hearts, one promise</div></div></div>
+          <div class="om-story-row" style="display:flex; gap:16px; align-items:flex-start;"><div style="font:500 17px 'Jost',sans-serif; color:#B0893C; width:56px; flex-shrink:0;">2026</div><div><div style="font:400 18px 'Jost',sans-serif;">The day our families meet</div></div></div>
         </div>
       </div>
 
       <!-- menu peek -->
-      <div style="width:100%; margin-top: 30px; background:#EDE8DB; border:1px solid rgba(176,137,60,0.4); border-radius:4px; padding:22px 24px; box-sizing:border-box;">
+      <div class="om-menu-box om-inview" style="width:100%; margin-top: 30px; background:#EDE8DB; border:1px solid rgba(176,137,60,0.4); border-radius:4px; padding:22px 24px; box-sizing:border-box;">
         <div style="font: 400 13px 'Jost', sans-serif; letter-spacing: 0.22em; text-transform: uppercase; color: #B0893C;">On the table</div>
-        <div style="font: 400 20px 'Cormorant Garamond', serif; font-style:italic; color:#2A3E34; margin-top:10px; line-height:1.7;">Slow-cooked biryani · Kebab platter<br>Mughlai curries · Phirni to finish</div>
+        <div style="font: 400 20px 'Cormorant Garamond', serif; font-style:italic; color:#2A3E34; margin-top:10px; line-height:1.7;"><span class="om-dish">Slow-cooked biryani</span> · <span class="om-dish">Kebab platter</span><br><span class="om-dish">Mughlai curries</span> · <span class="om-dish">Phirni to finish</span></div>
       </div>
 
       <!-- when & where -->
-      <div style="width:100%; margin-top: 30px; display:flex; gap: 18px; justify-content:center; text-align:center;">
-        <div style="flex:1;"><div style="font:400 12px 'Jost',sans-serif;letter-spacing:0.2em;text-transform:uppercase;color:#B0893C;">When</div><div style="font:400 17px 'Jost',sans-serif;margin-top:8px;line-height:1.5;">Sunday<br>09 / 08 / 2026<br>10:30 AM – 2 PM IST
+      <div class="om-whenwhere om-inview" style="width:100%; margin-top: 30px; display:flex; gap: 18px; justify-content:center; text-align:center;">
+        <div class="om-slide-l" style="flex:1;"><div style="font:400 12px 'Jost',sans-serif;letter-spacing:0.2em;text-transform:uppercase;color:#B0893C;">When</div><div style="font:400 17px 'Jost',sans-serif;margin-top:8px;line-height:1.5;">Sunday<br>09 / 08 / 2026<br>10:30 AM – 2 PM IST
           <sc-if value="{{ showLocalTime }}" hint-placeholder-val="{{ false }}">
             <br><span style="font-size:13px;color:#7A8A80;">({{ localTimeRange }} your time)</span>
           </sc-if>
         </div></div>
-        <div style="width:1px;background:rgba(176,137,60,0.4);"></div>
-        <div style="flex:1;"><div style="font:400 12px 'Jost',sans-serif;letter-spacing:0.2em;text-transform:uppercase;color:#B0893C;">Where</div><div style="font:400 15px 'Jost',sans-serif;margin-top:8px;line-height:1.5;"><span style="color:#B0893C;font-weight:500;">Zaitoon Restaurant</span><br>Anna Nagar East, Chennai<br><span style="color:#7A8A80;font-size:13px;">Opp. Old Zaitoon Building</span></div></div>
+        <div class="om-divider-grow" style="width:1px;background:rgba(176,137,60,0.4);"></div>
+        <div class="om-slide-r" style="flex:1;"><div style="font:400 12px 'Jost',sans-serif;letter-spacing:0.2em;text-transform:uppercase;color:#B0893C;">Where</div><div style="font:400 15px 'Jost',sans-serif;margin-top:8px;line-height:1.5;"><span style="color:#B0893C;font-weight:500;">Zaitoon Restaurant</span><br>Anna Nagar East, Chennai<br><span style="color:#7A8A80;font-size:13px;">Opp. Old Zaitoon Building</span></div></div>
       </div>
 
       <!-- action buttons -->
-      <div style="width:100%; margin-top: 30px; display:flex; flex-direction:column; gap:12px;">
-        <a href="{{ primaryCalHref }}" download="{{ primaryCalDownload }}" target="_blank" rel="noopener" style="display:flex; align-items:center; justify-content:center; gap:10px; text-decoration:none; background:#1E4034; color:#E7C878; padding:16px; border-radius:999px; font:500 16px 'Jost',sans-serif; letter-spacing:0.03em;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E7C878" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>{{ primaryCalLabel }}</a>
-        <a href="{{ secondaryCalHref }}" download="{{ secondaryCalDownload }}" target="_blank" rel="noopener" style="text-align:center; text-decoration:underline; color:#3E5348; font:400 13px 'Jost',sans-serif;">{{ secondaryCalLabel }}</a>
-        <a href="https://www.google.com/maps/search/?api=1&query=Zaitoon%20Restaurant%20Anna%20Nagar%20East%20Chennai%20600102" target="_blank" style="display:flex; align-items:center; justify-content:center; gap:10px; text-decoration:none; background:#F5F2E9; color:#1E4034; border:1.5px solid #1E4034; padding:15px; border-radius:999px; font:500 16px 'Jost',sans-serif; letter-spacing:0.03em;"><svg width="18" height="18" viewBox="0 0 24 24" fill="#1E4034"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>Open location in Maps</a>
+      <div class="om-inview" style="width:100%; margin-top: 30px; display:flex; flex-direction:column; gap:12px;">
+        <a href="{{ primaryCalHref }}" download="{{ primaryCalDownload }}" target="_blank" rel="noopener" class="om-tap om-focus-dark" style="display:flex; align-items:center; justify-content:center; gap:10px; text-decoration:none; background:#1E4034; color:#E7C878; padding:16px; border-radius:999px; font:500 16px 'Jost',sans-serif; letter-spacing:0.03em;"><svg class="om-cal-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E7C878" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>{{ primaryCalLabel }}</a>
+        <a href="{{ secondaryCalHref }}" download="{{ secondaryCalDownload }}" target="_blank" rel="noopener" class="om-tap om-underline" style="text-align:center; color:#3E5348; font:400 13px 'Jost',sans-serif;">{{ secondaryCalLabel }}</a>
+        <a href="https://www.google.com/maps/search/?api=1&query=Zaitoon%20Restaurant%20Anna%20Nagar%20East%20Chennai%20600102" target="_blank" class="om-tap" style="display:flex; align-items:center; justify-content:center; gap:10px; text-decoration:none; background:#F5F2E9; color:#1E4034; border:1.5px solid #1E4034; padding:15px; border-radius:999px; font:500 16px 'Jost',sans-serif; letter-spacing:0.03em;"><svg class="om-pin-icon" width="18" height="18" viewBox="0 0 24 24" fill="#1E4034"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>Open location in Maps</a>
       </div>
 
       <!-- RSVP -->
-      <div style="width:100%; margin-top: 30px; background:#1E4034; border-radius:6px; padding:26px 24px; box-sizing:border-box; text-align:center;">
+      <div class="om-rsvp-card om-inview {{ glowClass }}" style="width:100%; margin-top: 30px; background:#1E4034; border-radius:6px; padding:26px 24px; box-sizing:border-box; text-align:center;">
         <div style="font: 500 24px 'Cormorant Garamond', serif; font-style:italic; color:#E7C878;">Will you join us?</div>
         <sc-if value="{{ rsvpDone }}" hint-placeholder-val="{{ false }}">
           <div style="margin-top:14px; font:400 17px 'Jost',sans-serif; color:#F2EDDD; line-height:1.55;">{{ rsvpMsg }}</div>
-          <button onClick="{{ changeRsvp }}" style="margin-top:12px; cursor:pointer; background:none; border:none; text-decoration:underline; color:#B7C4BB; font:400 13px 'Jost',sans-serif;">Need to change your response?</button>
+          <button onClick="{{ changeRsvp }}" class="om-tap om-underline om-focus-dark" style="margin-top:12px; cursor:pointer; background:none; border:none; color:#B7C4BB; font:400 13px 'Jost',sans-serif;">Need to change your response?</button>
         </sc-if>
         <sc-if value="{{ rsvpOpen }}" hint-placeholder-val="{{ true }}">
-          <input type="text" placeholder="Your name" value="{{ guestName }}" onChange="{{ onNameChange }}" maxLength="60" style="width:100%; margin-top:16px; padding:13px 16px; border-radius:999px; border:1.5px solid rgba(231,200,120,0.5); background:rgba(255,255,255,0.08); color:#F2EDDD; font:400 15px 'Jost',sans-serif; box-sizing:border-box; text-align:center;" />
+          <input type="text" placeholder="Your name" value="{{ guestName }}" onChange="{{ onNameChange }}" maxLength="60" class="om-rsvp-input {{ shakeClass }}" style="width:100%; margin-top:16px; padding:13px 16px; border-radius:999px; border:1.5px solid rgba(231,200,120,0.5); background:rgba(255,255,255,0.08); color:#F2EDDD; font:400 15px 'Jost',sans-serif; box-sizing:border-box; text-align:center;" />
           <div style="display:flex; gap:12px; margin-top:12px;">
-            <button onClick="{{ accept }}" disabled="{{ rsvpBusy }}" style="flex:1; cursor:pointer; background:#E7C878; color:#1E2B22; border:none; padding:14px; border-radius:999px; font:500 15px 'Jost',sans-serif; opacity:{{ rsvpBusyOpacity }};">{{ acceptLabel }}</button>
-            <button onClick="{{ decline }}" disabled="{{ rsvpBusy }}" style="flex:1; cursor:pointer; background:transparent; color:#E7C878; border:1.5px solid rgba(231,200,120,0.6); padding:14px; border-radius:999px; font:500 15px 'Jost',sans-serif; opacity:{{ rsvpBusyOpacity }};">{{ declineLabel }}</button>
+            <button onClick="{{ accept }}" disabled="{{ rsvpBusy }}" class="om-tap om-focus-dark" style="flex:1; cursor:pointer; background:#E7C878; color:#1E2B22; border:none; padding:14px; border-radius:999px; font:500 15px 'Jost',sans-serif; opacity:{{ rsvpBusyOpacity }};">{{ acceptLabel }}</button>
+            <button onClick="{{ decline }}" disabled="{{ rsvpBusy }}" class="om-tap om-focus-dark" style="flex:1; cursor:pointer; background:transparent; color:#E7C878; border:1.5px solid rgba(231,200,120,0.6); padding:14px; border-radius:999px; font:500 15px 'Jost',sans-serif; opacity:{{ rsvpBusyOpacity }};">{{ declineLabel }}</button>
           </div>
           <sc-if value="{{ rsvpError }}" hint-placeholder-val="{{ false }}">
             <div style="margin-top:10px; font:400 13px 'Jost',sans-serif; color:#F4B4A6;">{{ rsvpError }}</div>
@@ -160,13 +261,13 @@
       </div>
 
       <!-- QR shared album -->
-      <a href="https://drive.google.com/drive/folders/1LOhweOYXz0bg3qx-0BTNSf4_sDkgRSi6?usp=sharing" target="_blank" rel="noopener" style="width:100%; margin-top: 30px; display:flex; align-items:center; gap:20px; text-align:left; text-decoration:none; color:inherit;">
-        <div style="width:104px; height:104px; flex-shrink:0; background:#FFFFFF; border:1px solid rgba(176,137,60,0.4); border-radius:8px; padding:7px; box-sizing:border-box;"><img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&margin=0&color=1E4034&bgcolor=FFFFFF&data=https%3A%2F%2Fdrive.google.com%2Fdrive%2Ffolders%2F1LOhweOYXz0bg3qx-0BTNSf4_sDkgRSi6%3Fusp%3Dsharing" alt="Shared album QR" width="200" height="200" loading="lazy" style="width:100%; height:100%; display:block;"></div>
+      <a href="https://drive.google.com/drive/folders/1LOhweOYXz0bg3qx-0BTNSf4_sDkgRSi6?usp=sharing" target="_blank" rel="noopener" class="om-tap om-qr-link om-inview" style="width:100%; margin-top: 30px; display:flex; align-items:center; gap:20px; text-align:left; text-decoration:none; color:inherit;">
+        <div class="om-qr-card" style="width:104px; height:104px; flex-shrink:0; background:#FFFFFF; border:1px solid rgba(176,137,60,0.4); border-radius:8px; padding:7px; box-sizing:border-box;"><img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&margin=0&color=1E4034&bgcolor=FFFFFF&data=https%3A%2F%2Fdrive.google.com%2Fdrive%2Ffolders%2F1LOhweOYXz0bg3qx-0BTNSf4_sDkgRSi6%3Fusp%3Dsharing" alt="Shared album QR" width="200" height="200" loading="lazy" style="width:100%; height:100%; display:block;"></div>
         <div><div style="font: 400 13px 'Jost', sans-serif; letter-spacing: 0.2em; text-transform: uppercase; color: #B0893C;">Snap &amp; share</div><div style="font: 400 16px 'Jost', sans-serif; margin-top:6px; line-height:1.5; color:#2A3E34;">Scan the code, or tap to open the folder, and add your photos from the day.</div></div>
       </a>
 
-      <svg width="160" height="20" viewBox="0 0 220 26" fill="none" style="margin: 34px 0 8px;"><path d="M8 13 H92" stroke="#C9A24B" stroke-width="1.4"/><path d="M212 13 H128" stroke="#C9A24B" stroke-width="1.4"/><path d="M110 5 L118 13 L110 21 L102 13 Z" fill="#C9A24B"/><circle cx="96" cy="13" r="2.4" fill="#C9A24B"/><circle cx="124" cy="13" r="2.4" fill="#C9A24B"/></svg>
-      <div class="om-shimmer" style="font: italic 500 22px 'Cormorant Garamond', serif;">we can't wait to meet you</div>
+      <svg class="om-closing om-inview" width="160" height="20" viewBox="0 0 220 26" fill="none" style="margin: 34px 0 8px;"><path class="om-close-line" d="M8 13 H92" stroke="#C9A24B" stroke-width="1.4"/><path class="om-close-line" d="M212 13 H128" stroke="#C9A24B" stroke-width="1.4"/><path class="om-close-pop" d="M110 5 L118 13 L110 21 L102 13 Z" fill="#C9A24B"/><circle class="om-close-pop" cx="96" cy="13" r="2.4" fill="#C9A24B"/><circle class="om-close-pop" cx="124" cy="13" r="2.4" fill="#C9A24B"/></svg>
+      <div class="om-shimmer om-inview" style="font: italic 500 22px 'Cormorant Garamond', serif;">we can't wait to meet you</div>
     </div>
   </div>
 
@@ -175,7 +276,7 @@
     <div style="position:absolute; inset:24px; border:1.5px solid rgba(201,162,75,0.4); pointer-events:none;"></div>
     <div style="font: 400 15px 'Jost', sans-serif; letter-spacing: 0.42em; text-transform: uppercase; color: #E7C878; padding-left: 0.42em;">You're invited</div>
     <div style="font: 600 46px 'Cormorant Garamond', serif; color: #F3EBD8; text-align:center; line-height:1.1;">Harsimran <span style="font-style:italic;color:#E7C878;">&amp;</span> Nivedha</div>
-    <div onClick="{{ open }}" onKeyDown="{{ openOnKey }}" role="button" tabIndex="0" aria-label="Open the invitation" class="om-seal" style="width: 150px; height: 150px; border-radius:50%; background: radial-gradient(circle at 38% 34%, #C9A24B, #9A7628); display:flex; align-items:center; justify-content:center; box-shadow: 0 10px 30px rgba(0,0,0,0.4), inset 0 2px 8px rgba(255,255,255,0.3);">
+    <div onClick="{{ open }}" onKeyDown="{{ openOnKey }}" role="button" tabIndex="0" aria-label="Open the invitation" class="om-seal {{ sealCrackClass }}" style="width: 150px; height: 150px; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow: 0 10px 30px rgba(0,0,0,0.4), inset 0 2px 8px rgba(255,255,255,0.3);">
       <div style="width:126px; height:126px; border-radius:50%; border:2px dashed rgba(30,43,34,0.5); display:flex; align-items:center; justify-content:center; font: 600 54px 'Cormorant Garamond', serif; color:#1E2B22;">H<span style="font-size:26px;font-style:italic;vertical-align:8px;margin:0 1px;">&amp;</span>N</div>
     </div>
     <div style="font: 400 16px 'Jost', sans-serif; letter-spacing: 0.14em; color: rgba(243,235,216,0.85);">Tap the seal to open</div>
@@ -203,8 +304,33 @@ class Component extends DCLogic {
     } catch {}
   };
 
+  startTick = () => {
+    clearInterval(this.tick);
+    this.tick = setInterval(() => {
+      if (this.state.now >= this.target) { clearInterval(this.tick); return; }
+      this.setState({ now: Date.now() });
+    }, 1000);
+  };
+
+  syncInert = () => {
+    const card = document.getElementById("om-card");
+    const env = document.querySelector(".om-env");
+    if (card) card.inert = !this.state.opened;
+    if (env) env.inert = this.state.opened;
+  };
+
   componentDidMount() {
-    this.tick = setInterval(() => this.setState({ now: Date.now() }), 1000);
+    this.reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    this.startTick();
+    this.onVisibility = () => {
+      if (document.hidden) {
+        clearInterval(this.tick);
+      } else {
+        this.setState({ now: Date.now() });
+        this.startTick();
+      }
+    };
+    document.addEventListener("visibilitychange", this.onVisibility);
     this.setState({ isAndroid: /Android/i.test(navigator.userAgent) });
     try {
       const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
@@ -217,21 +343,49 @@ class Component extends DCLogic {
         });
       }
     } catch {}
+
+    if (this.reducedMotion) {
+      document.querySelectorAll(".om-inview").forEach((el) => el.classList.add("om-shown"));
+    } else {
+      this._io = new IntersectionObserver((entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add("om-shown");
+            this._io.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.15, rootMargin: "0px 0px -8% 0px" });
+      document.querySelectorAll(".om-inview").forEach((el) => this._io.observe(el));
+    }
+    this.syncInert();
+  }
+  componentDidUpdate() {
+    this.syncInert();
   }
   componentWillUnmount() {
     clearInterval(this.tick);
     clearInterval(this.typer);
+    document.removeEventListener("visibilitychange", this.onVisibility);
+    if (this._io) this._io.disconnect();
   }
   open = () => {
     if (this.state.opened) return;
     this.setState({ opened: true });
     this.saveLocal({ opened: true });
-    let i = 0;
-    this.typer = setInterval(() => {
-      i += 1;
-      this.setState({ note: this.fullNote.slice(0, i) });
-      if (i >= this.fullNote.length) clearInterval(this.typer);
-    }, 28);
+    if (this.reducedMotion) {
+      this.setState({ note: this.fullNote });
+    } else {
+      let i = 0;
+      this.typer = setInterval(() => {
+        i += 2;
+        this.setState({ note: this.fullNote.slice(0, i) });
+        if (i >= this.fullNote.length) clearInterval(this.typer);
+      }, 40);
+    }
+    setTimeout(() => {
+      const card = document.getElementById("om-card");
+      if (card) card.focus();
+    }, this.reducedMotion ? 50 : 1000);
   };
   openOnKey = (e) => {
     if (e.key === "Enter" || e.key === " ") {
@@ -313,10 +467,13 @@ class Component extends DCLogic {
       envOpen: this.state.opened ? "open" : "",
       open: this.open,
       openOnKey: this.openOnKey,
+      sealCrackClass: this.state.opened ? "om-seal-crack" : "",
       cd: { d: String(d), h: this.pad(h), m: this.pad(m), s: this.pad(s) },
+      countdownSummary: `${d} days and ${h} hours until we meet`,
       eventPassed,
       eventUpcoming: !eventPassed,
       note: this.state.note,
+      showCaret: this.state.note.length < this.fullNote.length && !this.reducedMotion,
       primaryCalHref: isAndroid ? gcalHrefVal : icsHrefVal,
       primaryCalLabel: isAndroid ? "Add to Google Calendar" : "Add to my calendar",
       primaryCalDownload: isAndroid ? undefined : "Harsimran-Nivedha-Lunch.ics",
@@ -338,6 +495,8 @@ class Component extends DCLogic {
       rsvpBusy: this.state.rsvpBusy,
       rsvpBusyOpacity: this.state.rsvpBusy ? 0.6 : 1,
       rsvpError: this.state.rsvpError,
+      glowClass: this.state.rsvp ? "om-glow" : "",
+      shakeClass: this.state.rsvpError ? "om-shake" : "",
       acceptLabel: this.state.rsvpBusy ? "Sending…" : "Joyfully accept",
       declineLabel: this.state.rsvpBusy ? "Sending…" : "Regretfully decline",
     };
