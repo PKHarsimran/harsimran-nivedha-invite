@@ -124,15 +124,19 @@
 
       <!-- when & where -->
       <div style="width:100%; margin-top: 30px; display:flex; gap: 18px; justify-content:center; text-align:center;">
-        <div style="flex:1;"><div style="font:400 12px 'Jost',sans-serif;letter-spacing:0.2em;text-transform:uppercase;color:#B0893C;">When</div><div style="font:400 17px 'Jost',sans-serif;margin-top:8px;line-height:1.5;">Sunday<br>09 / 08 / 2026<br>10:30 AM – 2 PM</div></div>
+        <div style="flex:1;"><div style="font:400 12px 'Jost',sans-serif;letter-spacing:0.2em;text-transform:uppercase;color:#B0893C;">When</div><div style="font:400 17px 'Jost',sans-serif;margin-top:8px;line-height:1.5;">Sunday<br>09 / 08 / 2026<br>10:30 AM – 2 PM IST
+          <sc-if value="{{ showLocalTime }}" hint-placeholder-val="{{ false }}">
+            <br><span style="font-size:13px;color:#7A8A80;">({{ localTimeRange }} your time)</span>
+          </sc-if>
+        </div></div>
         <div style="width:1px;background:rgba(176,137,60,0.4);"></div>
         <div style="flex:1;"><div style="font:400 12px 'Jost',sans-serif;letter-spacing:0.2em;text-transform:uppercase;color:#B0893C;">Where</div><div style="font:400 15px 'Jost',sans-serif;margin-top:8px;line-height:1.5;"><span style="color:#B0893C;font-weight:500;">Zaitoon Restaurant</span><br>Anna Nagar East, Chennai<br><span style="color:#7A8A80;font-size:13px;">Opp. Old Zaitoon Building</span></div></div>
       </div>
 
       <!-- action buttons -->
       <div style="width:100%; margin-top: 30px; display:flex; flex-direction:column; gap:12px;">
-        <a href="{{ icsHref }}" download="Harsimran-Nivedha-Lunch.ics" style="display:flex; align-items:center; justify-content:center; gap:10px; text-decoration:none; background:#1E4034; color:#E7C878; padding:16px; border-radius:999px; font:500 16px 'Jost',sans-serif; letter-spacing:0.03em;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E7C878" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Add to my calendar</a>
-        <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Introduction%20%26%20Lunch%20%E2%80%94%20Harsimran%20%26%20Nivedha&dates=20260809T050000Z%2F20260809T083000Z&details=Meeting%20the%20family%20over%20lunch.%20Opposite%20the%20Old%20Zaitoon%20Building.&location=Zaitoon%20Restaurant%2C%20Anna%20Nagar%20East%2C%20Chennai%20600102" target="_blank" rel="noopener" style="text-align:center; text-decoration:underline; color:#3E5348; font:400 13px 'Jost',sans-serif;">Prefer Google Calendar? Add it here</a>
+        <a href="{{ primaryCalHref }}" download="{{ primaryCalDownload }}" target="_blank" rel="noopener" style="display:flex; align-items:center; justify-content:center; gap:10px; text-decoration:none; background:#1E4034; color:#E7C878; padding:16px; border-radius:999px; font:500 16px 'Jost',sans-serif; letter-spacing:0.03em;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E7C878" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>{{ primaryCalLabel }}</a>
+        <a href="{{ secondaryCalHref }}" download="{{ secondaryCalDownload }}" target="_blank" rel="noopener" style="text-align:center; text-decoration:underline; color:#3E5348; font:400 13px 'Jost',sans-serif;">{{ secondaryCalLabel }}</a>
         <a href="https://www.google.com/maps/search/?api=1&query=Zaitoon%20Restaurant%20Anna%20Nagar%20East%20Chennai%20600102" target="_blank" style="display:flex; align-items:center; justify-content:center; gap:10px; text-decoration:none; background:#F5F2E9; color:#1E4034; border:1.5px solid #1E4034; padding:15px; border-radius:999px; font:500 16px 'Jost',sans-serif; letter-spacing:0.03em;"><svg width="18" height="18" viewBox="0 0 24 24" fill="#1E4034"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>Open location in Maps</a>
       </div>
 
@@ -183,8 +187,12 @@
 const FORMSPREE_ENDPOINT = "https://formspree.io/f/meeyavql";
 const STORAGE_KEY = "hn-lunch-rsvp";
 
+function icsEscape(text) {
+  return String(text).replace(/\\/g, "\\\\").replace(/,/g, "\\,").replace(/;/g, "\\;").replace(/\n/g, "\\n");
+}
+
 class Component extends DCLogic {
-  state = { opened: false, now: Date.now(), note: "", rsvp: null, guestName: "", rsvpBusy: false, rsvpError: "" };
+  state = { opened: false, now: Date.now(), note: "", rsvp: null, guestName: "", rsvpBusy: false, rsvpError: "", isAndroid: false };
   fullNote = "Dear family, we have waited a long while for this day. Over a slow, happy lunch we hope to share stories, laughter, and the beginning of one big family. With love \u2014 Harsimran & Nivedha";
   target = Date.UTC(2026, 7, 9, 5, 0, 0); // 10:30 AM IST, in UTC so the countdown is correct for guests in any timezone
 
@@ -197,6 +205,7 @@ class Component extends DCLogic {
 
   componentDidMount() {
     this.tick = setInterval(() => this.setState({ now: Date.now() }), 1000);
+    this.setState({ isAndroid: /Android/i.test(navigator.userAgent) });
     try {
       const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
       if (saved) {
@@ -287,11 +296,18 @@ class Component extends DCLogic {
       "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//HN//Invite//EN", "BEGIN:VEVENT",
       "UID:hn-lunch-20260809@invite", "DTSTAMP:20260717T000000Z",
       "DTSTART:20260809T050000Z", "DTEND:20260809T083000Z",
-      "SUMMARY:Introduction & Lunch \u2014 Harsimran & Nivedha",
-      "LOCATION:Zaitoon Restaurant, Anna Nagar East, Chennai 600102",
-      "DESCRIPTION:Meeting the family over lunch. Opposite the Old Zaitoon Building.",
+      "SUMMARY:" + icsEscape("Introduction & Lunch \u2014 Harsimran & Nivedha"),
+      "LOCATION:" + icsEscape("Zaitoon Restaurant, Anna Nagar East, Chennai 600102"),
+      "DESCRIPTION:" + icsEscape("Meeting the family over lunch. Opposite the Old Zaitoon Building."),
       "END:VEVENT", "END:VCALENDAR"
     ].join("\r\n");
+    const icsHrefVal = "data:text/calendar;charset=utf-8," + encodeURIComponent(ics);
+    const gcalHrefVal = "https://calendar.google.com/calendar/render?action=TEMPLATE&text=Introduction%20%26%20Lunch%20%E2%80%94%20Harsimran%20%26%20Nivedha&dates=20260809T050000Z%2F20260809T083000Z&details=Meeting%20the%20family%20over%20lunch.%20Opposite%20the%20Old%20Zaitoon%20Building.&location=Zaitoon%20Restaurant%2C%20Anna%20Nagar%20East%2C%20Chennai%20600102";
+    const isAndroid = this.state.isAndroid;
+
+    const localStart = new Intl.DateTimeFormat(undefined, { hour: "numeric", minute: "2-digit" }).format(new Date(Date.UTC(2026, 7, 9, 5, 0, 0)));
+    const localEnd = new Intl.DateTimeFormat(undefined, { hour: "numeric", minute: "2-digit" }).format(new Date(Date.UTC(2026, 7, 9, 8, 30, 0)));
+    const showLocalTime = -new Date().getTimezoneOffset() !== 330;
 
     return {
       envOpen: this.state.opened ? "open" : "",
@@ -301,7 +317,14 @@ class Component extends DCLogic {
       eventPassed,
       eventUpcoming: !eventPassed,
       note: this.state.note,
-      icsHref: "data:text/calendar;charset=utf-8," + encodeURIComponent(ics),
+      primaryCalHref: isAndroid ? gcalHrefVal : icsHrefVal,
+      primaryCalLabel: isAndroid ? "Add to Google Calendar" : "Add to my calendar",
+      primaryCalDownload: isAndroid ? undefined : "Harsimran-Nivedha-Lunch.ics",
+      secondaryCalHref: isAndroid ? icsHrefVal : gcalHrefVal,
+      secondaryCalLabel: isAndroid ? "Prefer a downloaded invite? Get the .ics file" : "Prefer Google Calendar? Add it here",
+      secondaryCalDownload: isAndroid ? "Harsimran-Nivedha-Lunch.ics" : undefined,
+      showLocalTime,
+      localTimeRange: `${localStart} – ${localEnd}`,
       rsvpDone: !!this.state.rsvp,
       rsvpOpen: !this.state.rsvp,
       rsvpMsg: this.state.rsvp === "yes"
