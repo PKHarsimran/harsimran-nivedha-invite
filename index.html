@@ -55,10 +55,10 @@
     .om-shimmer { background: linear-gradient(100deg, #B0893C 20%, #F1D999 46%, #E7C878 50%, #B0893C 74%); background-size: 200% auto; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; animation: om-shimmer 5.5s linear infinite; }
     .om-laurel path, .om-laurel circle { stroke-dasharray: 900; animation: om-draw 2.4s ease forwards; }
     .om-caret { display: inline-block; width: 2px; height: 1em; background: #B0893C; margin-left: 2px; vertical-align: -2px; animation: om-caret 1s step-end infinite; }
-    .om-reveal > *:nth-child(-n+6) { animation: om-rise 0.7s cubic-bezier(.2,.7,.3,1) both; }
-    .om-reveal > *:nth-child(2){animation-delay:.06s}.om-reveal > *:nth-child(3){animation-delay:.12s}.om-reveal > *:nth-child(4){animation-delay:.18s}.om-reveal > *:nth-child(5){animation-delay:.24s}.om-reveal > *:nth-child(6){animation-delay:.3s}
-    .om-env { position: fixed; inset: 0; z-index: 20; transition: transform 1s cubic-bezier(.7,0,.3,1), opacity 1s; }
-    .om-env.open { transform: translateY(-104%); opacity: 0; pointer-events: none; }
+    .om-reveal.om-opened > *:nth-child(-n+6) { animation: om-rise 0.8s cubic-bezier(.16,.9,.24,1) both; }
+    .om-reveal.om-opened > *:nth-child(2){animation-delay:.08s}.om-reveal.om-opened > *:nth-child(3){animation-delay:.16s}.om-reveal.om-opened > *:nth-child(4){animation-delay:.24s}.om-reveal.om-opened > *:nth-child(5){animation-delay:.32s}.om-reveal.om-opened > *:nth-child(6){animation-delay:.4s}
+    .om-env { position: fixed; inset: 0; z-index: 20; transition: transform 1.1s cubic-bezier(.7,0,.15,1), opacity .9s ease; }
+    .om-env.open { transform: translateY(-104%) scale(0.96); opacity: 0; pointer-events: none; }
     .om-seal {
       cursor: pointer;
       background-repeat: no-repeat;
@@ -170,7 +170,7 @@
     <div aria-hidden="true" style="position: absolute; inset: 0; pointer-events: none; opacity: 0.05; background-image: radial-gradient(circle, #1E4034 1.5px, transparent 1.6px); background-size: 26px 26px;"></div>
     <div aria-hidden="true" style="position: absolute; top: 40%; left: 50%; transform: translate(-50%,-50%); font: 700 340px 'Cormorant Garamond', serif; color: #1E4034; opacity: 0.035; pointer-events: none; line-height: 1;">&amp;</div>
 
-    <div class="om-reveal" style="position: relative; padding: 52px 40px 46px; display: flex; flex-direction: column; align-items: center; text-align: center; box-sizing: border-box;">
+    <div class="om-reveal {{ revealClass }}" style="position: relative; padding: 52px 40px 46px; display: flex; flex-direction: column; align-items: center; text-align: center; box-sizing: border-box;">
 
       <div style="font: 400 15px 'Jost', sans-serif; letter-spacing: 0.4em; text-transform: uppercase; color: #B0893C; padding-left: 0.4em;">Together with our families</div>
 
@@ -311,7 +311,7 @@ function icsEscape(text) {
 }
 
 class Component extends DCLogic {
-  state = { opened: false, now: Date.now(), note: "", rsvp: null, guestName: "", partySize: 1, rsvpBusy: false, rsvpError: "", isAndroid: false };
+  state = { opened: false, justOpened: false, now: Date.now(), note: "", rsvp: null, guestName: "", partySize: 1, rsvpBusy: false, rsvpError: "", isAndroid: false };
   fullNote = "Dear family, we have waited a long while for this day. Over a slow, happy lunch we hope to share stories, laughter, and the beginning of one big family. With love \u2014 Harsimran & Nivedha";
   target = Date.UTC(2026, 7, 9, 5, 0, 0); // 10:30 AM IST, in UTC so the countdown is correct for guests in any timezone
 
@@ -402,7 +402,7 @@ class Component extends DCLogic {
   }
   open = () => {
     if (this.state.opened) return;
-    this.setState({ opened: true });
+    this.setState({ opened: true, justOpened: true });
     this.saveLocal({ opened: true });
     if (this.reducedMotion) {
       this.setState({ note: this.fullNote });
@@ -509,6 +509,7 @@ class Component extends DCLogic {
 
     return {
       envOpen: this.state.opened ? "open" : "",
+      revealClass: this.state.justOpened ? "om-opened" : "",
       open: this.open,
       openOnKey: this.openOnKey,
       sealCrackClass: this.state.opened ? "om-seal-crack" : "",
