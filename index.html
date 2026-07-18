@@ -81,9 +81,10 @@
 
     /* our story timeline */
     .om-timeline { position: relative; }
-    .om-timeline::before { content: ''; position: absolute; left: 27px; top: 8px; bottom: 8px; width: 2px; background: linear-gradient(#C9A24B,#E7C878); transform: scaleY(0); transform-origin: top; transition: transform 1.1s cubic-bezier(.2,.7,.3,1); }
+    .om-timeline::before { content: ''; position: absolute; left: 63px; top: 8px; bottom: 8px; width: 2px; background: linear-gradient(#C9A24B,#E7C878); transform: scaleY(0); transform-origin: top; transition: transform 1.1s cubic-bezier(.2,.7,.3,1); }
     .om-timeline.om-shown::before { transform: scaleY(1); }
-    .om-story-row { opacity: 0; transform: translateX(-8px); transition: opacity .5s ease, transform .5s ease; }
+    .om-story-row { position: relative; opacity: 0; transform: translateX(-8px); transition: opacity .5s ease, transform .5s ease; }
+    .om-story-row::before { content: ''; position: absolute; left: 60px; top: 6px; width: 8px; height: 8px; border-radius: 50%; background: #E7C878; border: 2px solid #C9A24B; box-sizing: border-box; }
     .om-timeline.om-shown .om-story-row { opacity: 1; transform: none; }
 
     /* when & where panels */
@@ -319,6 +320,14 @@ class Component extends DCLogic {
     if (env) env.inert = this.state.opened;
   };
 
+  checkInView = () => {
+    const vh = window.innerHeight || document.documentElement.clientHeight;
+    document.querySelectorAll(".om-inview:not(.om-shown)").forEach((el) => {
+      const r = el.getBoundingClientRect();
+      if (r.top < vh && r.bottom > 0) el.classList.add("om-shown");
+    });
+  };
+
   componentDidMount() {
     this.reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     this.startTick();
@@ -328,6 +337,7 @@ class Component extends DCLogic {
       } else {
         this.setState({ now: Date.now() });
         this.startTick();
+        this.checkInView();
       }
     };
     document.addEventListener("visibilitychange", this.onVisibility);
@@ -347,15 +357,18 @@ class Component extends DCLogic {
     if (this.reducedMotion) {
       document.querySelectorAll(".om-inview").forEach((el) => el.classList.add("om-shown"));
     } else {
-      this._io = new IntersectionObserver((entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) {
-            e.target.classList.add("om-shown");
-            this._io.unobserve(e.target);
-          }
-        });
-      }, { threshold: 0.15, rootMargin: "0px 0px -8% 0px" });
-      document.querySelectorAll(".om-inview").forEach((el) => this._io.observe(el));
+      this.checkInView();
+      this._scrollTicking = false;
+      this._onScroll = () => {
+        if (this._scrollTicking) return;
+        this._scrollTicking = true;
+        setTimeout(() => {
+          this.checkInView();
+          this._scrollTicking = false;
+        }, 100);
+      };
+      window.addEventListener("scroll", this._onScroll, { passive: true });
+      window.addEventListener("resize", this._onScroll);
     }
     this.syncInert();
   }
@@ -366,7 +379,8 @@ class Component extends DCLogic {
     clearInterval(this.tick);
     clearInterval(this.typer);
     document.removeEventListener("visibilitychange", this.onVisibility);
-    if (this._io) this._io.disconnect();
+    window.removeEventListener("scroll", this._onScroll);
+    window.removeEventListener("resize", this._onScroll);
   }
   open = () => {
     if (this.state.opened) return;
