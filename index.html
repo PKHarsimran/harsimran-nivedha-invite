@@ -23,6 +23,15 @@
   <meta property="og:title" content="Harsimran & Nivedha — Introduction & Lunch">
   <meta property="og:description" content="Join us for lunch as our families meet for the first time — Sunday, Aug 9 2026 at Zaitoon Restaurant, Chennai.">
   <meta property="og:type" content="website">
+  <meta property="og:url" content="https://harsim.ca/harsimran-nivedha-invite/">
+  <meta property="og:image" content="https://harsim.ca/harsimran-nivedha-invite/og-image.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Harsimran & Nivedha — Introduction & Lunch invitation">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Harsimran & Nivedha — Introduction & Lunch">
+  <meta name="twitter:description" content="Join us for lunch as our families meet for the first time — Sunday, Aug 9 2026 at Zaitoon Restaurant, Chennai.">
+  <meta name="twitter:image" content="https://harsim.ca/harsimran-nivedha-invite/og-image.jpg">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='31' fill='%231E4034'/%3E%3Ccircle cx='32' cy='32' r='27' fill='none' stroke='%23C9A24B' stroke-width='1.6'/%3E%3Ctext x='32' y='42' font-family='Georgia,serif' font-size='26' font-weight='700' text-anchor='middle' fill='%23E7C878'%3EH%3Ctspan font-style='italic' font-weight='400' font-size='16' dy='1'%3E%26%3C/tspan%3EN%3C/text%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
@@ -251,6 +260,14 @@
         </sc-if>
         <sc-if value="{{ rsvpOpen }}" hint-placeholder-val="{{ true }}">
           <input type="text" placeholder="Your name" value="{{ guestName }}" onChange="{{ onNameChange }}" maxLength="60" class="om-rsvp-input {{ shakeClass }}" style="width:100%; margin-top:16px; padding:13px 16px; border-radius:999px; border:1.5px solid rgba(231,200,120,0.5); background:rgba(255,255,255,0.08); color:#F2EDDD; font:400 15px 'Jost',sans-serif; box-sizing:border-box; text-align:center;" />
+          <div style="display:flex; align-items:center; justify-content:center; gap:14px; margin-top:14px;">
+            <span style="font:400 13px 'Jost',sans-serif; color:#B7C4BB; letter-spacing:0.05em;">Party size</span>
+            <div style="display:flex; align-items:center; gap:10px;">
+              <button type="button" onClick="{{ decrementParty }}" disabled="{{ partyDecDisabled }}" aria-label="Decrease party size" class="om-tap om-focus-dark" style="width:32px; height:32px; border-radius:50%; border:1.5px solid rgba(231,200,120,0.5); background:transparent; color:#E7C878; font:500 18px 'Jost',sans-serif; cursor:pointer; line-height:1;">&minus;</button>
+              <span aria-live="polite" style="min-width:20px; text-align:center; font:500 17px 'Cormorant Garamond',serif; color:#F2EDDD;">{{ partySize }}</span>
+              <button type="button" onClick="{{ incrementParty }}" disabled="{{ partyIncDisabled }}" aria-label="Increase party size" class="om-tap om-focus-dark" style="width:32px; height:32px; border-radius:50%; border:1.5px solid rgba(231,200,120,0.5); background:transparent; color:#E7C878; font:500 18px 'Jost',sans-serif; cursor:pointer; line-height:1;">+</button>
+            </div>
+          </div>
           <div style="display:flex; gap:12px; margin-top:12px;">
             <button onClick="{{ accept }}" disabled="{{ rsvpBusy }}" class="om-tap om-focus-dark" style="flex:1; cursor:pointer; background:#E7C878; color:#1E2B22; border:none; padding:14px; border-radius:999px; font:500 15px 'Jost',sans-serif; opacity:{{ rsvpBusyOpacity }};">{{ acceptLabel }}</button>
             <button onClick="{{ decline }}" disabled="{{ rsvpBusy }}" class="om-tap om-focus-dark" style="flex:1; cursor:pointer; background:transparent; color:#E7C878; border:1.5px solid rgba(231,200,120,0.6); padding:14px; border-radius:999px; font:500 15px 'Jost',sans-serif; opacity:{{ rsvpBusyOpacity }};">{{ declineLabel }}</button>
@@ -294,7 +311,7 @@ function icsEscape(text) {
 }
 
 class Component extends DCLogic {
-  state = { opened: false, now: Date.now(), note: "", rsvp: null, guestName: "", rsvpBusy: false, rsvpError: "", isAndroid: false };
+  state = { opened: false, now: Date.now(), note: "", rsvp: null, guestName: "", partySize: 1, rsvpBusy: false, rsvpError: "", isAndroid: false };
   fullNote = "Dear family, we have waited a long while for this day. Over a slow, happy lunch we hope to share stories, laughter, and the beginning of one big family. With love \u2014 Harsimran & Nivedha";
   target = Date.UTC(2026, 7, 9, 5, 0, 0); // 10:30 AM IST, in UTC so the countdown is correct for guests in any timezone
 
@@ -349,6 +366,7 @@ class Component extends DCLogic {
           opened: !!saved.opened,
           note: saved.opened ? this.fullNote : "",
           guestName: saved.guestName || "",
+          partySize: saved.partySize || 1,
           rsvp: saved.rsvp || null,
         });
       }
@@ -411,6 +429,16 @@ class Component extends DCLogic {
     this.setState({ guestName: e.target.value, rsvpError: "" });
     this.saveLocal({ guestName: e.target.value });
   };
+  incrementParty = () => {
+    const next = Math.min(8, this.state.partySize + 1);
+    this.setState({ partySize: next });
+    this.saveLocal({ partySize: next });
+  };
+  decrementParty = () => {
+    const next = Math.max(1, this.state.partySize - 1);
+    this.setState({ partySize: next });
+    this.saveLocal({ partySize: next });
+  };
   accept = () => this.submitRSVP("yes");
   decline = () => this.submitRSVP("no");
   changeRsvp = () => {
@@ -427,14 +455,16 @@ class Component extends DCLogic {
     }
     this.setState({ rsvpBusy: true, rsvpError: "" });
     const responseLabel = response === "yes" ? "Accepted" : "Declined";
+    const partySize = response === "yes" ? this.state.partySize : 1;
     fetch(FORMSPREE_ENDPOINT, {
       method: "POST",
       headers: { "Content-Type": "application/json", Accept: "application/json" },
       body: JSON.stringify({
         name,
         response: responseLabel,
+        partySize: response === "yes" ? partySize : "n/a",
         event: "Harsimran & Nivedha — Introduction & Lunch",
-        _subject: `RSVP ${responseLabel} — ${name}`,
+        _subject: `RSVP ${responseLabel} — ${name}${response === "yes" ? ` (${partySize})` : ""}`,
       }),
     })
       .then((res) => {
@@ -499,13 +529,18 @@ class Component extends DCLogic {
       rsvpDone: !!this.state.rsvp,
       rsvpOpen: !this.state.rsvp,
       rsvpMsg: this.state.rsvp === "yes"
-        ? "Wonderful \u2014 we're so glad you'll be there. See you at the table!"
+        ? `Wonderful \u2014 we're so glad your party of ${this.state.partySize} will be there. See you at the table!`
         : "We'll miss you, but thank you for letting us know. Warmly, H & N.",
       accept: this.accept,
       decline: this.decline,
       changeRsvp: this.changeRsvp,
       guestName: this.state.guestName,
       onNameChange: this.onNameChange,
+      partySize: this.state.partySize,
+      incrementParty: this.incrementParty,
+      decrementParty: this.decrementParty,
+      partyDecDisabled: this.state.rsvpBusy || this.state.partySize <= 1,
+      partyIncDisabled: this.state.rsvpBusy || this.state.partySize >= 8,
       rsvpBusy: this.state.rsvpBusy,
       rsvpBusyOpacity: this.state.rsvpBusy ? 0.6 : 1,
       rsvpError: this.state.rsvpError,
