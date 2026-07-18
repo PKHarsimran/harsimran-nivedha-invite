@@ -158,6 +158,20 @@
       .om-underline { transition: background-size .05s ease; }
       .om-env { transition: opacity .2s linear !important; }
     }
+
+    @media print {
+      body { background: #fff; }
+      .om-env { display: none !important; }
+      #om-card { box-shadow: none !important; max-width: 100% !important; }
+      .om-print-hide { display: none !important; }
+      /* force all animation/scroll-hidden content to its visible end state */
+      .om-inview, .om-reveal > *, .om-story-row, .om-dish, .om-slide-l, .om-slide-r {
+        opacity: 1 !important; transform: none !important; animation: none !important;
+      }
+      .om-timeline::before, .om-divider-grow { transform: none !important; }
+      .om-close-line { stroke-dashoffset: 0 !important; }
+      .om-close-pop { opacity: 1 !important; }
+    }
   </style>
 </helmet>
 
@@ -245,14 +259,14 @@
       </div>
 
       <!-- action buttons -->
-      <div class="om-inview" style="width:100%; margin-top: 30px; display:flex; flex-direction:column; gap:12px;">
+      <div class="om-inview om-print-hide" style="width:100%; margin-top: 30px; display:flex; flex-direction:column; gap:12px;">
         <a href="{{ primaryCalHref }}" download="{{ primaryCalDownload }}" target="_blank" rel="noopener" class="om-tap om-focus-dark" style="display:flex; align-items:center; justify-content:center; gap:10px; text-decoration:none; background:#1E4034; color:#E7C878; padding:16px; border-radius:999px; font:500 16px 'Jost',sans-serif; letter-spacing:0.03em;"><svg class="om-cal-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E7C878" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>{{ primaryCalLabel }}</a>
         <a href="{{ secondaryCalHref }}" download="{{ secondaryCalDownload }}" target="_blank" rel="noopener" class="om-tap om-underline" style="text-align:center; color:#3E5348; font:400 13px 'Jost',sans-serif;">{{ secondaryCalLabel }}</a>
         <a href="https://www.google.com/maps/search/?api=1&query=Zaitoon%20Restaurant%20Anna%20Nagar%20East%20Chennai%20600102" target="_blank" class="om-tap" style="display:flex; align-items:center; justify-content:center; gap:10px; text-decoration:none; background:#F5F2E9; color:#1E4034; border:1.5px solid #1E4034; padding:15px; border-radius:999px; font:500 16px 'Jost',sans-serif; letter-spacing:0.03em;"><svg class="om-pin-icon" width="18" height="18" viewBox="0 0 24 24" fill="#1E4034"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>Open location in Maps</a>
       </div>
 
       <!-- RSVP -->
-      <div class="om-rsvp-card om-inview {{ glowClass }}" style="width:100%; margin-top: 30px; background:#1E4034; border-radius:6px; padding:26px 24px; box-sizing:border-box; text-align:center;">
+      <div class="om-rsvp-card om-inview om-print-hide {{ glowClass }}" style="width:100%; margin-top: 30px; background:#1E4034; border-radius:6px; padding:26px 24px; box-sizing:border-box; text-align:center;">
         <div style="font: 500 24px 'Cormorant Garamond', serif; font-style:italic; color:#E7C878;">Will you join us?</div>
         <sc-if value="{{ rsvpDone }}" hint-placeholder-val="{{ false }}">
           <div style="margin-top:14px; font:400 17px 'Jost',sans-serif; color:#F2EDDD; line-height:1.55;">{{ rsvpMsg }}</div>
@@ -280,9 +294,12 @@
 
       <!-- QR shared album -->
       <a href="https://drive.google.com/drive/folders/1LOhweOYXz0bg3qx-0BTNSf4_sDkgRSi6?usp=sharing" target="_blank" rel="noopener" class="om-tap om-qr-link om-inview" style="width:100%; margin-top: 30px; display:flex; align-items:center; gap:20px; text-align:left; text-decoration:none; color:inherit;">
-        <div class="om-qr-card" style="width:104px; height:104px; flex-shrink:0; background:#FFFFFF; border:1px solid rgba(176,137,60,0.4); border-radius:8px; padding:7px; box-sizing:border-box;"><img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&margin=0&color=1E4034&bgcolor=FFFFFF&data=https%3A%2F%2Fdrive.google.com%2Fdrive%2Ffolders%2F1LOhweOYXz0bg3qx-0BTNSf4_sDkgRSi6%3Fusp%3Dsharing" alt="Shared album QR" width="200" height="200" loading="lazy" style="width:100%; height:100%; display:block;"></div>
+        <div class="om-qr-card" style="width:104px; height:104px; flex-shrink:0; background:#FFFFFF; border:1px solid rgba(176,137,60,0.4); border-radius:8px; padding:7px; box-sizing:border-box;"><img src="./qr-album.png" alt="Shared album QR" width="600" height="600" loading="lazy" style="width:100%; height:100%; display:block;"></div>
         <div><div style="font: 400 13px 'Jost', sans-serif; letter-spacing: 0.2em; text-transform: uppercase; color: #B0893C;">Snap &amp; share</div><div style="font: 400 16px 'Jost', sans-serif; margin-top:6px; line-height:1.5; color:#2A3E34;">Scan the code, or tap to open the folder, and add your photos from the day.</div></div>
       </a>
+
+      <!-- share invitation -->
+      <button onClick="{{ share }}" class="om-tap om-inview om-print-hide" aria-label="Share this invitation" style="margin-top:30px; display:flex; align-items:center; justify-content:center; gap:9px; background:transparent; border:1.5px solid rgba(176,137,60,0.55); color:#1E4034; padding:13px 24px; border-radius:999px; font:500 15px 'Jost',sans-serif; letter-spacing:0.02em; cursor:pointer;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1E4034" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>{{ shareLabel }}</button>
 
       <svg class="om-closing om-inview" width="160" height="20" viewBox="0 0 220 26" fill="none" style="margin: 34px 0 8px;"><path class="om-close-line" d="M8 13 H92" stroke="#C9A24B" stroke-width="1.4"/><path class="om-close-line" d="M212 13 H128" stroke="#C9A24B" stroke-width="1.4"/><path class="om-close-pop" d="M110 5 L118 13 L110 21 L102 13 Z" fill="#C9A24B"/><circle class="om-close-pop" cx="96" cy="13" r="2.4" fill="#C9A24B"/><circle class="om-close-pop" cx="124" cy="13" r="2.4" fill="#C9A24B"/></svg>
       <div class="om-shimmer om-inview" style="font: italic 500 22px 'Cormorant Garamond', serif;">we can't wait to meet you</div>
@@ -311,7 +328,7 @@ function icsEscape(text) {
 }
 
 class Component extends DCLogic {
-  state = { opened: false, justOpened: false, now: Date.now(), note: "", rsvp: null, guestName: "", partySize: 1, rsvpBusy: false, rsvpError: "", isAndroid: false };
+  state = { opened: false, justOpened: false, now: Date.now(), note: "", rsvp: null, guestName: "", partySize: 1, rsvpBusy: false, rsvpError: "", isAndroid: false, shareMsg: "" };
   fullNote = "Dear family, we have waited a long while for this day. Over a slow, happy lunch we hope to share stories, laughter, and the beginning of one big family. With love \u2014 Harsimran & Nivedha";
   target = Date.UTC(2026, 7, 9, 5, 0, 0); // 10:30 AM IST, in UTC so the countdown is correct for guests in any timezone
 
@@ -396,6 +413,7 @@ class Component extends DCLogic {
   componentWillUnmount() {
     clearInterval(this.tick);
     clearInterval(this.typer);
+    clearTimeout(this._shareTimer);
     document.removeEventListener("visibilitychange", this.onVisibility);
     window.removeEventListener("scroll", this._onScroll);
     window.removeEventListener("resize", this._onScroll);
@@ -404,6 +422,7 @@ class Component extends DCLogic {
     if (this.state.opened) return;
     this.setState({ opened: true, justOpened: true });
     this.saveLocal({ opened: true });
+    this.track("open_invite");
     if (this.reducedMotion) {
       this.setState({ note: this.fullNote });
     } else {
@@ -446,6 +465,38 @@ class Component extends DCLogic {
     this.saveLocal({ rsvp: null });
   };
 
+  track = (name, params) => {
+    try { if (window.gtag) window.gtag("event", name, params || {}); } catch {}
+  };
+
+  flashShare = (msg) => {
+    this.setState({ shareMsg: msg });
+    clearTimeout(this._shareTimer);
+    this._shareTimer = setTimeout(() => this.setState({ shareMsg: "" }), 2400);
+  };
+  share = async () => {
+    const url = location.origin + location.pathname;
+    this.track("share_invite");
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: "Harsimran & Nivedha — Introduction & Lunch",
+          text: "You're invited! Join us for lunch as our families meet — Sunday, Aug 9 2026, Chennai.",
+          url,
+        });
+      } catch (e) {
+        // native share sheet dismissed by the user — nothing to do
+      }
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      this.flashShare("Link copied — paste to share");
+    } catch (e) {
+      this.flashShare("Couldn't copy — the link is in your address bar");
+    }
+  };
+
   submitRSVP = (response) => {
     if (this.state.rsvpBusy) return;
     const name = this.state.guestName.trim();
@@ -471,6 +522,7 @@ class Component extends DCLogic {
         if (!res.ok) throw new Error("send failed");
         this.setState({ rsvp: response, rsvpBusy: false });
         this.saveLocal({ rsvp: response, guestName: name });
+        this.track("rsvp", { response: responseLabel, party_size: partySize });
       })
       .catch(() => {
         this.setState({
@@ -535,6 +587,8 @@ class Component extends DCLogic {
       accept: this.accept,
       decline: this.decline,
       changeRsvp: this.changeRsvp,
+      share: this.share,
+      shareLabel: this.state.shareMsg || "Share this invitation",
       guestName: this.state.guestName,
       onNameChange: this.onNameChange,
       partySize: this.state.partySize,
