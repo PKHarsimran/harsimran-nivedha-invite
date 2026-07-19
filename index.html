@@ -363,7 +363,11 @@ class Component extends DCLogic {
     const vh = window.innerHeight || document.documentElement.clientHeight;
     document.querySelectorAll(".om-inview:not(.om-shown)").forEach((el) => {
       const r = el.getBoundingClientRect();
-      if (r.top < vh && r.bottom > 0) this.markShown(el);
+      // Reveal once the scroll position has reached (or passed) this element — not only
+      // while it's still overlapping the viewport. A fast scroll/fling can move a section
+      // fully past the viewport between two throttled checks; requiring r.bottom > 0 here
+      // meant that section would never intersect a check and would stay stuck invisible.
+      if (r.top < vh) this.markShown(el);
     });
   };
 
