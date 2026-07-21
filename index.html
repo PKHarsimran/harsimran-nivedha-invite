@@ -1,11 +1,18 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#1E4034">
 <meta name="robots" content="noindex, nofollow">
 <style>body{background:#DED9CC;margin:0}</style>
+<!-- support.js boots by loading React/ReactDOM from unpkg before rendering anything,
+     so getting these connections/downloads started as early as possible during HTML
+     parsing (rather than waiting for support.js to execute and discover them) shortens
+     the time to first paint. -->
+<link rel="preconnect" href="https://unpkg.com" crossorigin>
+<link rel="preload" as="script" href="https://unpkg.com/react@18.3.1/umd/react.production.min.js" integrity="sha384-DGyLxAyjq0f9SPpVevD6IgztCFlnMF6oW/XQGmfe+IsZ8TqEiDrcHkMLKI6fiB/Z" crossorigin="anonymous">
+<link rel="preload" as="script" href="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" integrity="sha384-gTGxhz21lVGYNMcdJOyq01Edg0jhn/c22nsx0kyqP0TxaV5WVdsSH1fSDUf5YJj1" crossorigin="anonymous">
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-KCWX2XJD28"></script>
 <script>
@@ -38,6 +45,7 @@
   <link rel="apple-touch-icon" href="./apple-touch-icon.png">
   <link rel="manifest" href="./manifest.json">
   <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
     body { margin: 0; background: #DED9CC; font-family: 'Jost', sans-serif; }
@@ -146,8 +154,26 @@
     /* accessibility helpers */
     .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
 
+    /* ambient touches: laurel twinkle + breathing watermark, both mostly-still with a long hold */
+    @keyframes om-glint { 0%, 88%, 100% { opacity: 1; } 94% { opacity: .5; } }
+    .om-glint { animation: om-glint 7s ease-in-out infinite; }
+    @keyframes om-mark-breathe { 0%, 100% { opacity: .035; transform: translate(-50%,-50%) scale(1); } 50% { opacity: .05; transform: translate(-50%,-50%) scale(1.015); } }
+    .om-mark-breathe { animation: om-mark-breathe 22s ease-in-out infinite; }
+
+    /* sticky RSVP shortcut */
+    .om-sticky-rsvp {
+      position: fixed; bottom: 22px; right: 20px; z-index: 15;
+      background: #1E4034; color: #E7C878; border: none;
+      padding: 13px 22px; border-radius: 999px;
+      font: 500 0.875rem 'Jost', sans-serif; letter-spacing: 0.04em; text-transform: uppercase;
+      cursor: pointer; box-shadow: 0 8px 24px rgba(0,0,0,0.28);
+      opacity: 0; transform: translateY(14px); pointer-events: none;
+      transition: opacity .3s ease, transform .3s ease;
+    }
+    .om-sticky-rsvp.om-sticky-visible { opacity: 1; transform: none; pointer-events: auto; }
+
     @media (prefers-reduced-motion: reduce) {
-      .om-ring, .om-float, .om-shimmer, .om-tap, .om-inview, .om-dish, .om-story-row, .om-slide-l, .om-slide-r, .om-divider-grow, .om-rsvp-card.om-glow, .om-seal-crack, .om-cal-icon, .om-pin-icon, .om-qr-link, .om-qr-card {
+      .om-ring, .om-float, .om-shimmer, .om-tap, .om-inview, .om-dish, .om-story-row, .om-slide-l, .om-slide-r, .om-divider-grow, .om-rsvp-card.om-glow, .om-seal-crack, .om-cal-icon, .om-pin-icon, .om-qr-link, .om-qr-card, .om-sticky-rsvp, .om-glint, .om-mark-breathe {
         animation: none !important; transition: none !important;
       }
       .om-laurel path, .om-laurel circle, .om-close-line { animation: none; stroke-dashoffset: 0; }
@@ -186,112 +212,112 @@
 
     <!-- faint repeating monogram watermark -->
     <div aria-hidden="true" style="position: absolute; inset: 0; pointer-events: none; opacity: 0.05; background-image: radial-gradient(circle, #1E4034 1.5px, transparent 1.6px); background-size: 26px 26px;"></div>
-    <div aria-hidden="true" style="position: absolute; top: 40%; left: 50%; transform: translate(-50%,-50%); font: 700 340px 'Cormorant Garamond', serif; color: #1E4034; opacity: 0.035; pointer-events: none; line-height: 1;">&amp;</div>
+    <div aria-hidden="true" class="om-mark-breathe" style="position: absolute; top: 40%; left: 50%; transform: translate(-50%,-50%); font: 700 21.25rem 'Cormorant Garamond', serif; color: #1E4034; opacity: 0.035; pointer-events: none; line-height: 1;">&amp;</div>
 
     <div class="om-reveal {{ revealClass }}" style="position: relative; padding: 52px 40px 46px; display: flex; flex-direction: column; align-items: center; text-align: center; box-sizing: border-box;">
 
-      <div style="font: 400 15px 'Jost', sans-serif; letter-spacing: 0.4em; text-transform: uppercase; color: #856327; padding-left: 0.4em;">Together with our families</div>
+      <div style="font: 400 0.9375rem 'Jost', sans-serif; letter-spacing: 0.4em; text-transform: uppercase; color: #856327; padding-left: 0.4em;">Together with our families</div>
 
       <!-- seal -->
       <div class="om-ring" style="position: relative; width: 220px; height: 220px; margin: 22px 0 6px; display: flex; align-items: center; justify-content: center;">
         <svg class="om-laurel" width="220" height="220" viewBox="0 0 300 300" fill="none" style="position: absolute; inset: 0;">
           <circle cx="150" cy="150" r="142" stroke="#C9A24B" stroke-width="2.4"/>
           <circle cx="150" cy="150" r="131" stroke="#C9A24B" stroke-width="0.9" opacity="0.5" style="animation:none;"/>
-          <path d="M150 6 l9 9 -9 9 -9 -9z" fill="#C9A24B" style="animation:none;"/>
-          <path d="M150 294 l7 7 -7 7 -7 -7z" fill="#C9A24B" style="animation:none;"/>
+          <path class="om-glint" d="M150 6 l9 9 -9 9 -9 -9z" fill="#C9A24B" style="animation-delay:0s;"/>
+          <path class="om-glint" d="M150 294 l7 7 -7 7 -7 -7z" fill="#C9A24B" style="animation-delay:3.5s;"/>
           <path d="M70 198 C57 177 57 150 70 128" stroke="#C9A24B" stroke-width="1.8" fill="none"/>
           <path d="M230 198 C243 177 243 150 230 128" stroke="#C9A24B" stroke-width="1.8" fill="none"/>
-          <g fill="#C9A24B" style="animation:none;">
-            <ellipse cx="60" cy="190" rx="5.2" ry="11.5" transform="rotate(42 60 190)"/><ellipse cx="55" cy="169" rx="5.2" ry="11.5" transform="rotate(22 55 169)"/><ellipse cx="54" cy="148" rx="5.2" ry="11.5" transform="rotate(4 54 148)"/><ellipse cx="58" cy="129" rx="5.2" ry="10.5" transform="rotate(-14 58 129)"/>
-            <ellipse cx="240" cy="190" rx="5.2" ry="11.5" transform="rotate(-42 240 190)"/><ellipse cx="245" cy="169" rx="5.2" ry="11.5" transform="rotate(-22 245 169)"/><ellipse cx="246" cy="148" rx="5.2" ry="11.5" transform="rotate(-4 246 148)"/><ellipse cx="242" cy="129" rx="5.2" ry="10.5" transform="rotate(14 242 129)"/>
+          <g fill="#C9A24B">
+            <ellipse class="om-glint" cx="60" cy="190" rx="5.2" ry="11.5" transform="rotate(42 60 190)" style="animation-delay:0.9s;"/><ellipse class="om-glint" cx="55" cy="169" rx="5.2" ry="11.5" transform="rotate(22 55 169)" style="animation-delay:1.8s;"/><ellipse class="om-glint" cx="54" cy="148" rx="5.2" ry="11.5" transform="rotate(4 54 148)" style="animation-delay:2.7s;"/><ellipse class="om-glint" cx="58" cy="129" rx="5.2" ry="10.5" transform="rotate(-14 58 129)" style="animation-delay:3.6s;"/>
+            <ellipse class="om-glint" cx="240" cy="190" rx="5.2" ry="11.5" transform="rotate(-42 240 190)" style="animation-delay:4.5s;"/><ellipse class="om-glint" cx="245" cy="169" rx="5.2" ry="11.5" transform="rotate(-22 245 169)" style="animation-delay:5.4s;"/><ellipse class="om-glint" cx="246" cy="148" rx="5.2" ry="11.5" transform="rotate(-4 246 148)" style="animation-delay:6.3s;"/><ellipse class="om-glint" cx="242" cy="129" rx="5.2" ry="10.5" transform="rotate(14 242 129)" style="animation-delay:7.2s;"/>
           </g>
         </svg>
-        <div style="font: 600 66px 'Cormorant Garamond', serif; color: #1E4034; line-height: 1;">H<span style="font: italic 400 46px 'Cormorant Garamond', serif; color: #856327; vertical-align: 6px; margin: 0 2px;">&amp;</span>N</div>
+        <div style="font: 600 4.125rem 'Cormorant Garamond', serif; color: #1E4034; line-height: 1;">H<span style="font: italic 400 2.875rem 'Cormorant Garamond', serif; color: #856327; vertical-align: 6px; margin: 0 2px;">&amp;</span>N</div>
       </div>
 
-      <div style="font: italic 500 26px 'Cormorant Garamond', serif; color: #856327; margin-top: 6px;">the joy of a first meeting</div>
-      <div style="font: 600 58px 'Cormorant Garamond', serif; line-height: 1.02; margin-top: 2px;">Introduction<br>&amp; Lunch</div>
-      <div style="font: 300 18px 'Jost', sans-serif; margin-top: 16px; line-height: 1.6; color: #3E5348;">Nivedha's family warmly invites you to lunch, as we welcome <span style="color:#1E4034;font-weight:500;">Harsimran</span> and share our very first afternoon together.</div>
+      <div style="font: italic 500 1.625rem 'Cormorant Garamond', serif; color: #856327; margin-top: 6px;">the joy of a first meeting</div>
+      <div style="font: 600 3.625rem 'Cormorant Garamond', serif; line-height: 1.02; margin-top: 2px;">Introduction<br>&amp; Lunch</div>
+      <div style="font: 300 1.125rem 'Jost', sans-serif; margin-top: 16px; line-height: 1.6; color: #3E5348;">Nivedha's family warmly invites you to lunch, as we welcome <span style="color:#1E4034;font-weight:500;">Harsimran</span> and share our very first afternoon together.</div>
 
       <!-- countdown -->
       <sc-if value="{{ eventPassed }}" hint-placeholder-val="{{ false }}">
         <div style="width: 100%; margin-top: 28px; background: #1E4034; border-radius: 4px; padding: 22px 12px; text-align: center; box-sizing: border-box;">
-          <span style="font: italic 500 20px 'Cormorant Garamond', serif; color: #E7C878;">Today's the day — see you at the table!</span>
+          <span style="font: italic 500 1.25rem 'Cormorant Garamond', serif; color: #E7C878;">Today's the day — see you at the table!</span>
         </div>
       </sc-if>
       <sc-if value="{{ eventUpcoming }}" hint-placeholder-val="{{ true }}">
         <div role="timer" aria-live="off" style="width: 100%; margin-top: 28px; background: #1E4034; border-radius: 4px; padding: 18px 12px; display: flex; justify-content: space-around; box-sizing: border-box;">
-          <div aria-hidden="true" style="display:flex;flex-direction:column;gap:4px;"><span style="font:500 30px 'Cormorant Garamond',serif;color:#E7C878;">{{ cd.d }}</span><span style="font:400 11px 'Jost',sans-serif;letter-spacing:0.18em;text-transform:uppercase;color:#B7C4BB;">days</span></div>
-          <div aria-hidden="true" style="display:flex;flex-direction:column;gap:4px;"><span style="font:500 30px 'Cormorant Garamond',serif;color:#E7C878;">{{ cd.h }}</span><span style="font:400 11px 'Jost',sans-serif;letter-spacing:0.18em;text-transform:uppercase;color:#B7C4BB;">hrs</span></div>
-          <div aria-hidden="true" style="display:flex;flex-direction:column;gap:4px;"><span style="font:500 30px 'Cormorant Garamond',serif;color:#E7C878;">{{ cd.m }}</span><span style="font:400 11px 'Jost',sans-serif;letter-spacing:0.18em;text-transform:uppercase;color:#B7C4BB;">min</span></div>
-          <div aria-hidden="true" style="display:flex;flex-direction:column;gap:4px;"><span style="font:500 30px 'Cormorant Garamond',serif;color:#E7C878;">{{ cd.s }}</span><span style="font:400 11px 'Jost',sans-serif;letter-spacing:0.18em;text-transform:uppercase;color:#B7C4BB;">sec</span></div>
+          <div aria-hidden="true" style="display:flex;flex-direction:column;gap:4px;"><span style="font:500 1.875rem 'Cormorant Garamond',serif;color:#E7C878;">{{ cd.d }}</span><span style="font:400 0.6875rem 'Jost',sans-serif;letter-spacing:0.18em;text-transform:uppercase;color:#B7C4BB;">days</span></div>
+          <div aria-hidden="true" style="display:flex;flex-direction:column;gap:4px;"><span style="font:500 1.875rem 'Cormorant Garamond',serif;color:#E7C878;">{{ cd.h }}</span><span style="font:400 0.6875rem 'Jost',sans-serif;letter-spacing:0.18em;text-transform:uppercase;color:#B7C4BB;">hrs</span></div>
+          <div aria-hidden="true" style="display:flex;flex-direction:column;gap:4px;"><span style="font:500 1.875rem 'Cormorant Garamond',serif;color:#E7C878;">{{ cd.m }}</span><span style="font:400 0.6875rem 'Jost',sans-serif;letter-spacing:0.18em;text-transform:uppercase;color:#B7C4BB;">min</span></div>
+          <div aria-hidden="true" style="display:flex;flex-direction:column;gap:4px;"><span style="font:500 1.875rem 'Cormorant Garamond',serif;color:#E7C878;">{{ cd.s }}</span><span style="font:400 0.6875rem 'Jost',sans-serif;letter-spacing:0.18em;text-transform:uppercase;color:#B7C4BB;">sec</span></div>
           <span class="sr-only">{{ countdownSummary }}</span>
         </div>
       </sc-if>
 
       <!-- typed note -->
       <div style="width: 100%; margin-top: 30px; text-align: left; border-left: 2px solid #C9A24B; padding: 4px 0 4px 18px; box-sizing: border-box; min-height: 132px;">
-        <div style="font: 400 13px 'Jost', sans-serif; letter-spacing: 0.22em; text-transform: uppercase; color: #856327;">A note from us</div>
-        <div style="font: italic 400 21px 'Cormorant Garamond', serif; line-height: 1.5; color: #2A3E34; margin-top: 8px;">{{ note }}<sc-if value="{{ showCaret }}" hint-placeholder-val="{{ false }}"><span class="om-caret"></span></sc-if></div>
+        <div style="font: 400 0.8125rem 'Jost', sans-serif; letter-spacing: 0.22em; text-transform: uppercase; color: #856327;">A note from us</div>
+        <div style="font: italic 400 1.3125rem 'Cormorant Garamond', serif; line-height: 1.5; color: #2A3E34; margin-top: 8px;">{{ note }}<sc-if value="{{ showCaret }}" hint-placeholder-val="{{ false }}"><span class="om-caret"></span></sc-if></div>
       </div>
 
       <!-- our story -->
       <div style="width:100%; margin-top: 32px; text-align:left; box-sizing:border-box;">
-        <div style="font: 400 13px 'Jost', sans-serif; letter-spacing: 0.22em; text-transform: uppercase; color: #856327; text-align:center;">Our little story</div>
+        <div style="font: 400 0.8125rem 'Jost', sans-serif; letter-spacing: 0.22em; text-transform: uppercase; color: #856327; text-align:center;">Our little story</div>
         <div class="om-timeline om-inview" data-section="story" style="display:flex; flex-direction:column; gap:2px; margin-top:16px;">
-          <div class="om-story-row" style="display:flex; gap:16px; align-items:flex-start;"><div style="font:500 17px 'Jost',sans-serif; color:#856327; width:56px; flex-shrink:0;">2018</div><div style="position:relative; padding-bottom:20px;"><div style="font:400 18px 'Jost',sans-serif;">A quiet first hello</div></div></div>
-          <div class="om-story-row" style="display:flex; gap:16px; align-items:flex-start;"><div style="font:500 17px 'Jost',sans-serif; color:#856327; width:56px; flex-shrink:0;">2023</div><div style="position:relative; padding-bottom:20px;"><div style="font:400 18px 'Jost',sans-serif;">Two hearts, one promise</div></div></div>
-          <div class="om-story-row" style="display:flex; gap:16px; align-items:flex-start;"><div style="font:500 17px 'Jost',sans-serif; color:#856327; width:56px; flex-shrink:0;">2026</div><div><div style="font:400 18px 'Jost',sans-serif;">The day our families meet</div></div></div>
+          <div class="om-story-row" style="display:flex; gap:16px; align-items:flex-start;"><div style="font:500 1.0625rem 'Jost',sans-serif; color:#856327; width:56px; flex-shrink:0;">2018</div><div style="position:relative; padding-bottom:20px;"><div style="font:400 1.125rem 'Jost',sans-serif;">A quiet first hello</div></div></div>
+          <div class="om-story-row" style="display:flex; gap:16px; align-items:flex-start;"><div style="font:500 1.0625rem 'Jost',sans-serif; color:#856327; width:56px; flex-shrink:0;">2023</div><div style="position:relative; padding-bottom:20px;"><div style="font:400 1.125rem 'Jost',sans-serif;">Two hearts, one promise</div></div></div>
+          <div class="om-story-row" style="display:flex; gap:16px; align-items:flex-start;"><div style="font:500 1.0625rem 'Jost',sans-serif; color:#856327; width:56px; flex-shrink:0;">2026</div><div><div style="font:400 1.125rem 'Jost',sans-serif;">The day our families meet</div></div></div>
         </div>
       </div>
 
       <!-- menu peek -->
       <div class="om-menu-box om-inview" data-section="menu" style="width:100%; margin-top: 30px; background:#EDE8DB; border:1px solid rgba(176,137,60,0.4); border-radius:4px; padding:22px 24px; box-sizing:border-box;">
-        <div style="font: 400 13px 'Jost', sans-serif; letter-spacing: 0.22em; text-transform: uppercase; color: #856327;">On the table</div>
-        <div style="font: 400 20px 'Cormorant Garamond', serif; font-style:italic; color:#2A3E34; margin-top:10px; line-height:1.7;"><span class="om-dish">Slow-cooked biryani</span> · <span class="om-dish">Kebab platter</span><br><span class="om-dish">Mughlai curries</span> · <span class="om-dish">Phirni to finish</span></div>
+        <div style="font: 400 0.8125rem 'Jost', sans-serif; letter-spacing: 0.22em; text-transform: uppercase; color: #856327;">On the table</div>
+        <div style="font: 400 1.25rem 'Cormorant Garamond', serif; font-style:italic; color:#2A3E34; margin-top:10px; line-height:1.7;"><span class="om-dish">Slow-cooked biryani</span> · <span class="om-dish">Kebab platter</span><br><span class="om-dish">Mughlai curries</span> · <span class="om-dish">Phirni to finish</span></div>
       </div>
 
       <!-- when & where -->
       <div class="om-whenwhere om-inview" data-section="when_where" style="width:100%; margin-top: 30px; display:flex; gap: 18px; justify-content:center; text-align:center;">
-        <div class="om-slide-l" style="flex:1;"><div style="font:400 12px 'Jost',sans-serif;letter-spacing:0.2em;text-transform:uppercase;color:#856327;">When</div><div style="font:400 17px 'Jost',sans-serif;margin-top:8px;line-height:1.5;">Sunday<br>09 / 08 / 2026<br>10:30 AM – 2 PM IST
+        <div class="om-slide-l" style="flex:1;"><div style="font:400 0.75rem 'Jost',sans-serif;letter-spacing:0.2em;text-transform:uppercase;color:#856327;">When</div><div style="font:400 1.0625rem 'Jost',sans-serif;margin-top:8px;line-height:1.5;">Sunday<br>09 / 08 / 2026<br>10:30 AM – 2 PM IST
           <sc-if value="{{ showLocalTime }}" hint-placeholder-val="{{ false }}">
-            <br><span style="font-size:13px;color:#5C6B62;">({{ localTimeRange }} your time)</span>
+            <br><span style="font-size:0.8125rem;color:#5C6B62;">({{ localTimeRange }} your time)</span>
           </sc-if>
         </div></div>
         <div class="om-divider-grow" style="width:1px;background:rgba(176,137,60,0.4);"></div>
-        <div class="om-slide-r" style="flex:1;"><div style="font:400 12px 'Jost',sans-serif;letter-spacing:0.2em;text-transform:uppercase;color:#856327;">Where</div><div style="font:400 15px 'Jost',sans-serif;margin-top:8px;line-height:1.5;"><span style="color:#856327;font-weight:500;">Zaitoon Restaurant</span><br>Anna Nagar East, Chennai<br><span style="color:#5C6B62;font-size:13px;">Opp. Old Zaitoon Building</span></div></div>
+        <div class="om-slide-r" style="flex:1;"><div style="font:400 0.75rem 'Jost',sans-serif;letter-spacing:0.2em;text-transform:uppercase;color:#856327;">Where</div><div style="font:400 0.9375rem 'Jost',sans-serif;margin-top:8px;line-height:1.5;"><span style="color:#856327;font-weight:500;">Zaitoon Restaurant</span><br>Anna Nagar East, Chennai<br><span style="color:#5C6B62;font-size:0.8125rem;">Opp. Old Zaitoon Building</span></div></div>
       </div>
 
       <!-- action buttons -->
       <div class="om-inview om-print-hide" data-section="actions" style="width:100%; margin-top: 30px; display:flex; flex-direction:column; gap:12px;">
-        <a href="{{ primaryCalHref }}" download="{{ primaryCalDownload }}" target="_blank" rel="noopener" onClick="{{ trackPrimaryCal }}" class="om-tap om-focus-dark" style="display:flex; align-items:center; justify-content:center; gap:10px; text-decoration:none; background:#1E4034; color:#E7C878; padding:16px; border-radius:999px; font:500 16px 'Jost',sans-serif; letter-spacing:0.03em;"><svg class="om-cal-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E7C878" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>{{ primaryCalLabel }}</a>
-        <a href="{{ secondaryCalHref }}" download="{{ secondaryCalDownload }}" target="_blank" rel="noopener" onClick="{{ trackSecondaryCal }}" class="om-tap om-underline" style="text-align:center; color:#3E5348; font:400 13px 'Jost',sans-serif;">{{ secondaryCalLabel }}</a>
-        <a href="https://www.google.com/maps/search/?api=1&query=Zaitoon%20Restaurant%20Anna%20Nagar%20East%20Chennai%20600102" target="_blank" onClick="{{ trackMapsClick }}" class="om-tap" style="display:flex; align-items:center; justify-content:center; gap:10px; text-decoration:none; background:#F5F2E9; color:#1E4034; border:1.5px solid #1E4034; padding:15px; border-radius:999px; font:500 16px 'Jost',sans-serif; letter-spacing:0.03em;"><svg class="om-pin-icon" width="18" height="18" viewBox="0 0 24 24" fill="#1E4034"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>Open location in Maps</a>
+        <a href="{{ primaryCalHref }}" download="{{ primaryCalDownload }}" target="_blank" rel="noopener" onClick="{{ trackPrimaryCal }}" class="om-tap om-focus-dark" style="display:flex; align-items:center; justify-content:center; gap:10px; text-decoration:none; background:#1E4034; color:#E7C878; padding:16px; border-radius:999px; font:500 1rem 'Jost',sans-serif; letter-spacing:0.03em;"><svg class="om-cal-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E7C878" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>{{ primaryCalLabel }}</a>
+        <a href="{{ secondaryCalHref }}" download="{{ secondaryCalDownload }}" target="_blank" rel="noopener" onClick="{{ trackSecondaryCal }}" class="om-tap om-underline" style="text-align:center; color:#3E5348; font:400 0.8125rem 'Jost',sans-serif;">{{ secondaryCalLabel }}</a>
+        <a href="https://www.google.com/maps/search/?api=1&query=Zaitoon%20Restaurant%20Anna%20Nagar%20East%20Chennai%20600102" target="_blank" onClick="{{ trackMapsClick }}" class="om-tap" style="display:flex; align-items:center; justify-content:center; gap:10px; text-decoration:none; background:#F5F2E9; color:#1E4034; border:1.5px solid #1E4034; padding:15px; border-radius:999px; font:500 1rem 'Jost',sans-serif; letter-spacing:0.03em;"><svg class="om-pin-icon" width="18" height="18" viewBox="0 0 24 24" fill="#1E4034"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>Open location in Maps</a>
       </div>
 
       <!-- RSVP -->
       <div class="om-rsvp-card om-inview om-print-hide {{ glowClass }}" data-section="rsvp" style="width:100%; margin-top: 30px; background:#1E4034; border-radius:6px; padding:26px 24px; box-sizing:border-box; text-align:center;">
-        <div style="font: 500 24px 'Cormorant Garamond', serif; font-style:italic; color:#E7C878;">Will you join us?</div>
+        <div style="font: 500 1.5rem 'Cormorant Garamond', serif; font-style:italic; color:#E7C878;">Will you join us?</div>
         <sc-if value="{{ rsvpDone }}" hint-placeholder-val="{{ false }}">
-          <div style="margin-top:14px; font:400 17px 'Jost',sans-serif; color:#F2EDDD; line-height:1.55;">{{ rsvpMsg }}</div>
-          <button onClick="{{ changeRsvp }}" class="om-tap om-underline om-focus-dark" style="margin-top:12px; cursor:pointer; background:none; border:none; color:#B7C4BB; font:400 13px 'Jost',sans-serif;">Need to change your response?</button>
+          <div style="margin-top:14px; font:400 1.0625rem 'Jost',sans-serif; color:#F2EDDD; line-height:1.55;">{{ rsvpMsg }}</div>
+          <button onClick="{{ changeRsvp }}" class="om-tap om-underline om-focus-dark" style="margin-top:12px; cursor:pointer; background:none; border:none; color:#B7C4BB; font:400 0.8125rem 'Jost',sans-serif;">Need to change your response?</button>
         </sc-if>
         <sc-if value="{{ rsvpOpen }}" hint-placeholder-val="{{ true }}">
-          <input type="text" placeholder="Your name" value="{{ guestName }}" onChange="{{ onNameChange }}" maxLength="60" class="om-rsvp-input {{ shakeClass }}" style="width:100%; margin-top:16px; padding:13px 16px; border-radius:999px; border:1.5px solid rgba(231,200,120,0.5); background:rgba(255,255,255,0.08); color:#F2EDDD; font:400 15px 'Jost',sans-serif; box-sizing:border-box; text-align:center;" />
+          <input type="text" placeholder="Your name" value="{{ guestName }}" onChange="{{ onNameChange }}" maxLength="60" class="om-rsvp-input {{ shakeClass }}" style="width:100%; margin-top:16px; padding:13px 16px; border-radius:999px; border:1.5px solid rgba(231,200,120,0.5); background:rgba(255,255,255,0.08); color:#F2EDDD; font:400 0.9375rem 'Jost',sans-serif; box-sizing:border-box; text-align:center;" />
           <div style="display:flex; align-items:center; justify-content:center; gap:14px; margin-top:14px;">
-            <span style="font:400 13px 'Jost',sans-serif; color:#B7C4BB; letter-spacing:0.05em;">Party size</span>
+            <span style="font:400 0.8125rem 'Jost',sans-serif; color:#B7C4BB; letter-spacing:0.05em;">Party size</span>
             <div style="display:flex; align-items:center; gap:10px;">
-              <button type="button" onClick="{{ decrementParty }}" disabled="{{ partyDecDisabled }}" aria-label="Decrease party size" class="om-tap om-focus-dark" style="width:44px; height:44px; border-radius:50%; border:1.5px solid rgba(231,200,120,0.5); background:transparent; color:#E7C878; font:500 18px 'Jost',sans-serif; cursor:pointer; line-height:1;">&minus;</button>
-              <span aria-live="polite" style="min-width:20px; text-align:center; font:500 17px 'Cormorant Garamond',serif; color:#F2EDDD;">{{ partySize }}</span>
-              <button type="button" onClick="{{ incrementParty }}" disabled="{{ partyIncDisabled }}" aria-label="Increase party size" class="om-tap om-focus-dark" style="width:44px; height:44px; border-radius:50%; border:1.5px solid rgba(231,200,120,0.5); background:transparent; color:#E7C878; font:500 18px 'Jost',sans-serif; cursor:pointer; line-height:1;">+</button>
+              <button type="button" onClick="{{ decrementParty }}" disabled="{{ partyDecDisabled }}" aria-label="Decrease party size" class="om-tap om-focus-dark" style="width:44px; height:44px; border-radius:50%; border:1.5px solid rgba(231,200,120,0.5); background:transparent; color:#E7C878; font:500 1.125rem 'Jost',sans-serif; cursor:pointer; line-height:1;">&minus;</button>
+              <span aria-live="polite" style="min-width:20px; text-align:center; font:500 1.0625rem 'Cormorant Garamond',serif; color:#F2EDDD;">{{ partySize }}</span>
+              <button type="button" onClick="{{ incrementParty }}" disabled="{{ partyIncDisabled }}" aria-label="Increase party size" class="om-tap om-focus-dark" style="width:44px; height:44px; border-radius:50%; border:1.5px solid rgba(231,200,120,0.5); background:transparent; color:#E7C878; font:500 1.125rem 'Jost',sans-serif; cursor:pointer; line-height:1;">+</button>
             </div>
           </div>
           <div style="display:flex; gap:12px; margin-top:12px;">
-            <button onClick="{{ accept }}" disabled="{{ rsvpBusy }}" class="om-tap om-focus-dark" style="flex:1; cursor:pointer; background:#E7C878; color:#1E2B22; border:none; padding:14px; border-radius:999px; font:500 15px 'Jost',sans-serif; opacity:{{ rsvpBusyOpacity }};">{{ acceptLabel }}</button>
-            <button onClick="{{ decline }}" disabled="{{ rsvpBusy }}" class="om-tap om-focus-dark" style="flex:1; cursor:pointer; background:transparent; color:#E7C878; border:1.5px solid rgba(231,200,120,0.6); padding:14px; border-radius:999px; font:500 15px 'Jost',sans-serif; opacity:{{ rsvpBusyOpacity }};">{{ declineLabel }}</button>
+            <button onClick="{{ accept }}" disabled="{{ rsvpBusy }}" class="om-tap om-focus-dark" style="flex:1; cursor:pointer; background:#E7C878; color:#1E2B22; border:none; padding:14px; border-radius:999px; font:500 0.9375rem 'Jost',sans-serif; opacity:{{ rsvpBusyOpacity }};">{{ acceptLabel }}</button>
+            <button onClick="{{ decline }}" disabled="{{ rsvpBusy }}" class="om-tap om-focus-dark" style="flex:1; cursor:pointer; background:transparent; color:#E7C878; border:1.5px solid rgba(231,200,120,0.6); padding:14px; border-radius:999px; font:500 0.9375rem 'Jost',sans-serif; opacity:{{ rsvpBusyOpacity }};">{{ declineLabel }}</button>
           </div>
           <sc-if value="{{ rsvpError }}" hint-placeholder-val="{{ false }}">
-            <div style="margin-top:10px; font:400 13px 'Jost',sans-serif; color:#F4B4A6;">{{ rsvpError }}</div>
+            <div style="margin-top:10px; font:400 0.8125rem 'Jost',sans-serif; color:#F4B4A6;">{{ rsvpError }}</div>
           </sc-if>
         </sc-if>
       </div>
@@ -299,27 +325,29 @@
       <!-- QR shared album -->
       <a href="https://drive.google.com/drive/folders/1LOhweOYXz0bg3qx-0BTNSf4_sDkgRSi6?usp=sharing" target="_blank" rel="noopener" onClick="{{ trackPhotosClick }}" class="om-tap om-qr-link om-inview" data-section="photos" style="width:100%; margin-top: 30px; display:flex; align-items:center; gap:20px; text-align:left; text-decoration:none; color:inherit;">
         <div class="om-qr-card" style="width:104px; height:104px; flex-shrink:0; background:#FFFFFF; border:1px solid rgba(176,137,60,0.4); border-radius:8px; padding:7px; box-sizing:border-box;"><img src="./qr-album.png" alt="Shared album QR" width="600" height="600" loading="lazy" style="width:100%; height:100%; display:block;"></div>
-        <div><div style="font: 400 13px 'Jost', sans-serif; letter-spacing: 0.2em; text-transform: uppercase; color: #856327;">Snap &amp; share</div><div style="font: 400 16px 'Jost', sans-serif; margin-top:6px; line-height:1.5; color:#2A3E34;">Scan the code, or tap to open the folder, and add your photos from the day.</div></div>
+        <div><div style="font: 400 0.8125rem 'Jost', sans-serif; letter-spacing: 0.2em; text-transform: uppercase; color: #856327;">Snap &amp; share</div><div style="font: 400 1rem 'Jost', sans-serif; margin-top:6px; line-height:1.5; color:#2A3E34;">Scan the code, or tap to open the folder, and add your photos from the day.</div></div>
       </a>
 
       <!-- share invitation -->
-      <button onClick="{{ share }}" class="om-tap om-inview om-print-hide" data-section="share_prompt" aria-label="Share this invitation" style="margin-top:30px; display:flex; align-items:center; justify-content:center; gap:9px; background:transparent; border:1.5px solid rgba(176,137,60,0.55); color:#1E4034; padding:13px 24px; border-radius:999px; font:500 15px 'Jost',sans-serif; letter-spacing:0.02em; cursor:pointer;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1E4034" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>{{ shareLabel }}</button>
+      <button onClick="{{ share }}" class="om-tap om-inview om-print-hide" data-section="share_prompt" aria-label="Share this invitation" style="margin-top:30px; display:flex; align-items:center; justify-content:center; gap:9px; background:transparent; border:1.5px solid rgba(176,137,60,0.55); color:#1E4034; padding:13px 24px; border-radius:999px; font:500 0.9375rem 'Jost',sans-serif; letter-spacing:0.02em; cursor:pointer;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1E4034" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>{{ shareLabel }}</button>
 
       <svg class="om-closing om-inview" width="160" height="20" viewBox="0 0 220 26" fill="none" style="margin: 34px 0 8px;"><path class="om-close-line" d="M8 13 H92" stroke="#C9A24B" stroke-width="1.4"/><path class="om-close-line" d="M212 13 H128" stroke="#C9A24B" stroke-width="1.4"/><path class="om-close-pop" d="M110 5 L118 13 L110 21 L102 13 Z" fill="#C9A24B"/><circle class="om-close-pop" cx="96" cy="13" r="2.4" fill="#C9A24B"/><circle class="om-close-pop" cx="124" cy="13" r="2.4" fill="#C9A24B"/></svg>
-      <div class="om-shimmer om-inview" data-section="end" style="font: italic 500 22px 'Cormorant Garamond', serif;">we can't wait to meet you</div>
+      <div class="om-shimmer om-inview" data-section="end" style="font: italic 500 1.375rem 'Cormorant Garamond', serif;">we can't wait to meet you</div>
     </div>
   </div>
 
   <!-- ===== Envelope overlay ===== -->
   <div class="om-env {{ envOpen }}" style="background: radial-gradient(circle at 50% 40%, #24503F 0%, #1E4034 55%, #142720 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 30px;">
     <div style="position:absolute; inset:24px; border:1.5px solid rgba(201,162,75,0.4); pointer-events:none;"></div>
-    <div style="font: 400 15px 'Jost', sans-serif; letter-spacing: 0.42em; text-transform: uppercase; color: #E7C878; padding-left: 0.42em;">You're invited</div>
-    <div style="font: 600 46px 'Cormorant Garamond', serif; color: #F3EBD8; text-align:center; line-height:1.1;">Harsimran <span style="font-style:italic;color:#E7C878;">&amp;</span> Nivedha</div>
+    <div style="font: 400 0.9375rem 'Jost', sans-serif; letter-spacing: 0.42em; text-transform: uppercase; color: #E7C878; padding-left: 0.42em;">You're invited</div>
+    <div style="font: 600 2.875rem 'Cormorant Garamond', serif; color: #F3EBD8; text-align:center; line-height:1.1;">Harsimran <span style="font-style:italic;color:#E7C878;">&amp;</span> Nivedha</div>
     <div onClick="{{ open }}" onKeyDown="{{ openOnKey }}" role="button" tabIndex="0" aria-label="Open the invitation" class="om-seal {{ sealCrackClass }}" style="width: 150px; height: 150px; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow: 0 10px 30px rgba(0,0,0,0.4), inset 0 2px 8px rgba(255,255,255,0.3);">
-      <div style="width:126px; height:126px; border-radius:50%; border:2px dashed rgba(30,43,34,0.5); display:flex; align-items:center; justify-content:center; font: 600 54px 'Cormorant Garamond', serif; color:#1E2B22;">H<span style="font-size:26px;font-style:italic;vertical-align:8px;margin:0 1px;">&amp;</span>N</div>
+      <div style="width:126px; height:126px; border-radius:50%; border:2px dashed rgba(30,43,34,0.5); display:flex; align-items:center; justify-content:center; font: 600 3.375rem 'Cormorant Garamond', serif; color:#1E2B22;">H<span style="font-size:1.625rem;font-style:italic;vertical-align:8px;margin:0 1px;">&amp;</span>N</div>
     </div>
-    <div style="font: 400 16px 'Jost', sans-serif; letter-spacing: 0.14em; color: rgba(243,235,216,0.85);">Tap the seal to open</div>
+    <div style="font: 400 1rem 'Jost', sans-serif; letter-spacing: 0.14em; color: rgba(243,235,216,0.85);">Tap the seal to open</div>
   </div>
+
+  <button onClick="{{ scrollToRsvp }}" class="om-sticky-rsvp om-focus-dark {{ stickyRsvpClass }}" aria-label="Jump to RSVP">RSVP</button>
 
 </div>
 </x-dc>
@@ -332,7 +360,7 @@ function icsEscape(text) {
 }
 
 class Component extends DCLogic {
-  state = { opened: false, justOpened: false, now: Date.now(), note: "", rsvp: null, guestName: "", partySize: 1, rsvpBusy: false, rsvpError: "", isAndroid: false, shareMsg: "" };
+  state = { opened: false, justOpened: false, now: Date.now(), note: "", rsvp: null, guestName: "", partySize: 1, rsvpBusy: false, rsvpError: "", isAndroid: false, shareMsg: "", showStickyRsvp: false };
   fullNote = "Dear family, we have waited a long while for this day. Over a slow, happy lunch we hope to share stories, laughter, and the beginning of one big family. With love \u2014 Harsimran & Nivedha";
   target = Date.UTC(2026, 7, 9, 5, 0, 0); // 10:30 AM IST, in UTC so the countdown is correct for guests in any timezone
 
@@ -375,6 +403,23 @@ class Component extends DCLogic {
     });
   };
 
+  checkStickyRsvp = () => {
+    const vh = window.innerHeight || document.documentElement.clientHeight;
+    const rsvpCard = document.querySelector(".om-rsvp-card");
+    const shouldShow =
+      this.state.opened &&
+      !this.state.rsvp &&
+      !!rsvpCard &&
+      window.scrollY > vh * 0.6 &&
+      rsvpCard.getBoundingClientRect().top >= vh * 0.3;
+    if (shouldShow !== this.state.showStickyRsvp) this.setState({ showStickyRsvp: shouldShow });
+  };
+  scrollToRsvp = () => {
+    this.track("click_sticky_rsvp");
+    const rsvpCard = document.querySelector(".om-rsvp-card");
+    if (rsvpCard) rsvpCard.scrollIntoView({ behavior: this.reducedMotion ? "auto" : "smooth", block: "center" });
+  };
+
   componentDidMount() {
     this.reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     this.startTick();
@@ -385,6 +430,7 @@ class Component extends DCLogic {
         this.setState({ now: Date.now() });
         this.startTick();
         this.checkInView();
+        this.checkStickyRsvp();
       }
     };
     document.addEventListener("visibilitychange", this.onVisibility);
@@ -406,22 +452,25 @@ class Component extends DCLogic {
       document.querySelectorAll(".om-inview").forEach((el) => this.markShown(el));
     } else {
       this.checkInView();
-      this._scrollTicking = false;
-      this._onScroll = () => {
-        if (this._scrollTicking) return;
-        this._scrollTicking = true;
-        setTimeout(() => {
-          this.checkInView();
-          this._scrollTicking = false;
-        }, 100);
-      };
-      window.addEventListener("scroll", this._onScroll, { passive: true });
-      window.addEventListener("resize", this._onScroll);
     }
+    this.checkStickyRsvp();
+    this._scrollTicking = false;
+    this._onScroll = () => {
+      if (this._scrollTicking) return;
+      this._scrollTicking = true;
+      setTimeout(() => {
+        if (!this.reducedMotion) this.checkInView();
+        this.checkStickyRsvp();
+        this._scrollTicking = false;
+      }, 100);
+    };
+    window.addEventListener("scroll", this._onScroll, { passive: true });
+    window.addEventListener("resize", this._onScroll);
     this.syncInert();
   }
   componentDidUpdate() {
     this.syncInert();
+    this.checkStickyRsvp();
   }
   componentWillUnmount() {
     clearInterval(this.tick);
@@ -610,6 +659,8 @@ class Component extends DCLogic {
       decline: this.decline,
       changeRsvp: this.changeRsvp,
       share: this.share,
+      scrollToRsvp: this.scrollToRsvp,
+      stickyRsvpClass: this.state.showStickyRsvp ? "om-sticky-visible" : "",
       trackMapsClick: this.trackMapsClick,
       trackPhotosClick: this.trackPhotosClick,
       trackPrimaryCal: this.trackPrimaryCal,
