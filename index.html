@@ -13,14 +13,22 @@
 <link rel="preconnect" href="https://unpkg.com" crossorigin>
 <link rel="preload" as="script" href="https://unpkg.com/react@18.3.1/umd/react.production.min.js" integrity="sha384-DGyLxAyjq0f9SPpVevD6IgztCFlnMF6oW/XQGmfe+IsZ8TqEiDrcHkMLKI6fiB/Z" crossorigin="anonymous">
 <link rel="preload" as="script" href="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" integrity="sha384-gTGxhz21lVGYNMcdJOyq01Edg0jhn/c22nsx0kyqP0TxaV5WVdsSH1fSDUf5YJj1" crossorigin="anonymous">
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-KCWX2XJD28"></script>
+<!-- Google tag (gtag.js) — skipped entirely when the browser signals Do Not Track /
+     Global Privacy Control, rather than loading it and just not calling config. -->
 <script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-KCWX2XJD28');
+  (function () {
+    var dnt = navigator.doNotTrack === "1" || navigator.doNotTrack === "yes" ||
+      window.doNotTrack === "1" || navigator.globalPrivacyControl === true;
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function () { window.dataLayer.push(arguments); };
+    if (dnt) return;
+    window.gtag('js', new Date());
+    window.gtag('config', 'G-KCWX2XJD28');
+    var s = document.createElement('script');
+    s.async = true;
+    s.src = 'https://www.googletagmanager.com/gtag/js?id=G-KCWX2XJD28';
+    document.head.appendChild(s);
+  })();
 </script>
 <script src="./support.js"></script>
 </head>
@@ -246,7 +254,10 @@
         </div>
       </sc-if>
       <sc-if value="{{ eventUpcoming }}" hint-placeholder-val="{{ true }}">
-        <div role="timer" aria-live="off" style="width: 100%; margin-top: 28px; background: #1E4034; border-radius: 4px; padding: 18px 12px; display: flex; justify-content: space-around; box-sizing: border-box;">
+        <sc-if value="{{ showCountdownBanner }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top: 26px; font: italic 500 1.0625rem 'Cormorant Garamond', serif; color: #856327;">{{ countdownBanner }}</div>
+        </sc-if>
+        <div role="timer" aria-live="off" style="width: 100%; margin-top: {{ countdownTilesMarginTop }}; background: #1E4034; border-radius: 4px; padding: 18px 12px; display: flex; justify-content: space-around; box-sizing: border-box;">
           <div aria-hidden="true" style="display:flex;flex-direction:column;gap:4px;"><span style="font:500 1.875rem 'Cormorant Garamond',serif;color:#E7C878;">{{ cd.d }}</span><span style="font:400 0.6875rem 'Jost',sans-serif;letter-spacing:0.18em;text-transform:uppercase;color:#B7C4BB;">days</span></div>
           <div aria-hidden="true" style="display:flex;flex-direction:column;gap:4px;"><span style="font:500 1.875rem 'Cormorant Garamond',serif;color:#E7C878;">{{ cd.h }}</span><span style="font:400 0.6875rem 'Jost',sans-serif;letter-spacing:0.18em;text-transform:uppercase;color:#B7C4BB;">hrs</span></div>
           <div aria-hidden="true" style="display:flex;flex-direction:column;gap:4px;"><span style="font:500 1.875rem 'Cormorant Garamond',serif;color:#E7C878;">{{ cd.m }}</span><span style="font:400 0.6875rem 'Jost',sans-serif;letter-spacing:0.18em;text-transform:uppercase;color:#B7C4BB;">min</span></div>
@@ -279,7 +290,7 @@
 
       <!-- when & where -->
       <div class="om-whenwhere om-inview" data-section="when_where" style="width:100%; margin-top: 30px; display:flex; gap: 18px; justify-content:center; text-align:center;">
-        <div class="om-slide-l" style="flex:1;"><div style="font:400 0.75rem 'Jost',sans-serif;letter-spacing:0.2em;text-transform:uppercase;color:#856327;">When</div><div style="font:400 1.0625rem 'Jost',sans-serif;margin-top:8px;line-height:1.5;">Sunday<br>09 / 08 / 2026<br>10:30 AM – 2 PM IST
+        <div class="om-slide-l" style="flex:1;"><div style="font:400 0.75rem 'Jost',sans-serif;letter-spacing:0.2em;text-transform:uppercase;color:#856327;">When</div><div style="font:400 1.0625rem 'Jost',sans-serif;margin-top:8px;line-height:1.5;">Sunday<br>August 9, 2026<br>10:30 AM – 2 PM IST
           <sc-if value="{{ showLocalTime }}" hint-placeholder-val="{{ false }}">
             <br><span style="font-size:0.8125rem;color:#5C6B62;">({{ localTimeRange }} your time)</span>
           </sc-if>
@@ -303,7 +314,7 @@
           <button onClick="{{ changeRsvp }}" class="om-tap om-underline om-focus-dark" style="margin-top:12px; cursor:pointer; background:none; border:none; color:#B7C4BB; font:400 0.8125rem 'Jost',sans-serif;">Need to change your response?</button>
         </sc-if>
         <sc-if value="{{ rsvpOpen }}" hint-placeholder-val="{{ true }}">
-          <input type="text" placeholder="Your name" value="{{ guestName }}" onChange="{{ onNameChange }}" maxLength="60" class="om-rsvp-input {{ shakeClass }}" style="width:100%; margin-top:16px; padding:13px 16px; border-radius:999px; border:1.5px solid rgba(231,200,120,0.5); background:rgba(255,255,255,0.08); color:#F2EDDD; font:400 0.9375rem 'Jost',sans-serif; box-sizing:border-box; text-align:center;" />
+          <input type="text" placeholder="Your name" value="{{ guestName }}" onChange="{{ onNameChange }}" onKeyDown="{{ onNameKeyDown }}" maxLength="60" class="om-rsvp-input {{ shakeClass }}" style="width:100%; margin-top:16px; padding:13px 16px; border-radius:999px; border:1.5px solid rgba(231,200,120,0.5); background:rgba(255,255,255,0.08); color:#F2EDDD; font:400 0.9375rem 'Jost',sans-serif; box-sizing:border-box; text-align:center;" />
           <div style="display:flex; align-items:center; justify-content:center; gap:14px; margin-top:14px;">
             <span style="font:400 0.8125rem 'Jost',sans-serif; color:#B7C4BB; letter-spacing:0.05em;">Party size</span>
             <div style="display:flex; align-items:center; gap:10px;">
@@ -360,7 +371,7 @@ function icsEscape(text) {
 }
 
 class Component extends DCLogic {
-  state = { opened: false, justOpened: false, now: Date.now(), note: "", rsvp: null, guestName: "", partySize: 1, rsvpBusy: false, rsvpError: "", isAndroid: false, shareMsg: "", showStickyRsvp: false };
+  state = { opened: false, justOpened: false, now: Date.now(), note: "", rsvp: null, justSubmitted: false, guestName: "", partySize: 1, rsvpBusy: false, rsvpError: "", isAndroid: false, shareMsg: "", showStickyRsvp: false };
   fullNote = "Dear family, we have waited a long while for this day. Over a slow, happy lunch we hope to share stories, laughter, and the beginning of one big family. With love \u2014 Harsimran & Nivedha";
   target = Date.UTC(2026, 7, 9, 5, 0, 0); // 10:30 AM IST, in UTC so the countdown is correct for guests in any timezone
 
@@ -510,6 +521,12 @@ class Component extends DCLogic {
     this.setState({ guestName: e.target.value, rsvpError: "" });
     this.saveLocal({ guestName: e.target.value });
   };
+  onNameKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      this.accept();
+    }
+  };
   incrementParty = () => {
     const next = Math.min(8, this.state.partySize + 1);
     this.setState({ partySize: next });
@@ -590,16 +607,19 @@ class Component extends DCLogic {
     })
       .then((res) => {
         if (!res.ok) throw new Error("send failed");
-        this.setState({ rsvp: response, rsvpBusy: false });
+        this.setState({ rsvp: response, justSubmitted: true, rsvpBusy: false });
         this.saveLocal({ rsvp: response, guestName: name });
         this.track("rsvp", { response: responseLabel, party_size: partySize });
       })
       .catch(() => {
+        const offline = !navigator.onLine;
         this.setState({
           rsvpBusy: false,
-          rsvpError: "Couldn't send your response — please try again or let us know directly.",
+          rsvpError: offline
+            ? "You appear to be offline — check your connection and try again."
+            : "Couldn't send your response — please try again or let us know directly.",
         });
-        this.track("rsvp_failed", { response: responseLabel });
+        this.track("rsvp_failed", { response: responseLabel, offline });
       });
   };
 
@@ -630,6 +650,18 @@ class Component extends DCLogic {
     const localEnd = new Intl.DateTimeFormat(undefined, { hour: "numeric", minute: "2-digit" }).format(new Date(Date.UTC(2026, 7, 9, 8, 30, 0)));
     const showLocalTime = -new Date().getTimezoneOffset() !== 330;
 
+    const countdownBanner = eventPassed ? "" : d <= 7 ? "Just days away!" : d <= 30 ? "Almost here!" : "";
+    const countdownTilesMarginTop = countdownBanner ? "12px" : "28px";
+
+    const firstName = this.state.guestName.trim().split(" ")[0];
+    const rsvpMsg = this.state.rsvp === "yes"
+      ? (this.state.justSubmitted
+          ? `Wonderful — we're so glad your party of ${this.state.partySize} will be there. See you at the table!`
+          : `Welcome back${firstName ? ", " + firstName : ""} — you're all set, we'll see your party of ${this.state.partySize} on the 9th!`)
+      : (this.state.justSubmitted
+          ? "We'll miss you, but thank you for letting us know. Warmly, H & N."
+          : `Welcome back${firstName ? ", " + firstName : ""} — we've got your note that you can't make it. Thank you again.`);
+
     return {
       envOpen: this.state.opened ? "open" : "",
       revealClass: this.state.justOpened ? "om-opened" : "",
@@ -638,6 +670,9 @@ class Component extends DCLogic {
       sealCrackClass: this.state.opened ? "om-seal-crack" : "",
       cd: { d: String(d), h: this.pad(h), m: this.pad(m), s: this.pad(s) },
       countdownSummary: `${d} days and ${h} hours until we meet`,
+      countdownBanner,
+      showCountdownBanner: !!countdownBanner,
+      countdownTilesMarginTop,
       eventPassed,
       eventUpcoming: !eventPassed,
       note: this.state.note,
@@ -652,9 +687,7 @@ class Component extends DCLogic {
       localTimeRange: `${localStart} – ${localEnd}`,
       rsvpDone: !!this.state.rsvp,
       rsvpOpen: !this.state.rsvp,
-      rsvpMsg: this.state.rsvp === "yes"
-        ? `Wonderful \u2014 we're so glad your party of ${this.state.partySize} will be there. See you at the table!`
-        : "We'll miss you, but thank you for letting us know. Warmly, H & N.",
+      rsvpMsg,
       accept: this.accept,
       decline: this.decline,
       changeRsvp: this.changeRsvp,
@@ -668,6 +701,7 @@ class Component extends DCLogic {
       shareLabel: this.state.shareMsg || "Share this invitation",
       guestName: this.state.guestName,
       onNameChange: this.onNameChange,
+      onNameKeyDown: this.onNameKeyDown,
       partySize: this.state.partySize,
       incrementParty: this.incrementParty,
       decrementParty: this.decrementParty,
